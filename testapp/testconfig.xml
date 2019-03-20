@@ -1,0 +1,29 @@
+<debut>
+
+	<source type="mysql">
+		<ip>127.0.0.1</ip>
+		<port>3306</port>
+		<name>TestPFE</name>
+		<user>root</user>
+		<password>root</password>
+	</source>
+
+	<cible type="hbase">
+		<ip>127.0.0.1</ip>
+		<port>2181</port>
+	</cible>
+
+	<StructureCible>
+		<name>EMPLOYEES</name>
+		<cols CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE" />
+	</StructureCible>
+
+
+	<RichKeyMapping type="Formule" usevg="false" tablesource="user"  columnqualifier="FAMILY_EMPLOYEE:name"  mappingformula="#firstName+' '+#lastName"/>
+	<RichKeyMapping type="Formule" usevg="false" tablesource="user"  columnqualifier="FAMILY_EMPLOYEE:age"  mappingformula="#getAge(#birthDate)"/>
+	<RichKeyMapping type="Formule"  usevg="false" tablesource="user" columnqualifier="FAMILY_EMPLOYEE:taille" mappingformula="#formatNumber(#taille)"/>
+	<RichKeyMapping type="condition"  ignore="false" tablesource="user" columnqualifier="FAMILY_EMPLOYEE:birthdate" value="#birthDate" mappingformula="#birthDate matches '^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$'"/>
+	<RichKeyMapping type="condition" tablesource="user" ignore="false" columnqualifier="FAMILY_EMPLOYEE:salaire" value="T(java.lang.String).valueOf(#salaire * #getcurrency('http://demo1525832.mockable.io/currency
+')) " mappingformula="#salaire gt 300 ? true : false"/>
+
+</debut>
