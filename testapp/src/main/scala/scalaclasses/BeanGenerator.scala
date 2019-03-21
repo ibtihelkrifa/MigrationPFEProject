@@ -26,6 +26,12 @@ class BeanGenerators(var json: JSONObject) {
 
     def guessValueClass(value: Object): Class[_] = {
 
+      try{
+        if(value.isInstanceOf[Integer])
+          return classOf[Integer]}
+      catch {
+        case e1: NumberFormatException =>
+      }
       try {
         if (value.isInstanceOf[Long])
           return classOf[Long]
@@ -33,12 +39,7 @@ class BeanGenerators(var json: JSONObject) {
       catch {
         case e1: NumberFormatException =>
       }
-      try{
-         if(value.isInstanceOf[Int])
-         return classOf[Integer]}
-      catch {
-        case e1: NumberFormatException =>
-      }
+
       try{
         if(value.isInstanceOf[Double])
          return classOf[Double]}

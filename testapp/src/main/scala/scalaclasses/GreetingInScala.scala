@@ -1,4 +1,5 @@
 package scalaclasses
+
 import org.apache.hadoop.hbase.HColumnDescriptor
 import java.sql.DriverManager
 import java.util
@@ -20,7 +21,6 @@ import org.json.simple.parser.JSONParser
 import org.springframework.expression.spel.standard.SpelExpressionParser
 
 class GreetingInScala {
-
 
 
   def configure(path: String): String = {
@@ -56,13 +56,11 @@ class GreetingInScala {
     DriverManager.getConnection(jdbcUrl, connectionProperties)
 
 
-
-
     //connection à la base de donnée hbase
-    var testtest=""
-    var colname=""
+    var testtest = ""
+    var colname = ""
 
-    var colfamily=""
+    var colfamily = ""
     try {
 
       val HbaseConf = HBaseConfiguration.create()
@@ -94,11 +92,11 @@ class GreetingInScala {
         })
 
       //parcoutir la liste des colonnes et complete la creation de descrpteur de la table
-      var age=""
-      var v= new util.ArrayList[(String,String)]
-      var types=""
-      var ColumnQualifier=""
-      var mappingformula=""
+      var v = new util.ArrayList[(String, String)]
+      var types = ""
+      var ColumnQualifier = ""
+      var table_source_name=""
+      var mappingformula = ""
       for (c: String <- cols.asScala) {
         val family = new HColumnDescriptor(Bytes.toBytes(c))
         tableDescriptor.addFamily(family)
@@ -113,101 +111,103 @@ class GreetingInScala {
 
       //commencer les transformation
 
-      val dftransformation= spark.read
+      val dftransformation = spark.read
         .option("rowTag", "RichKeyMapping")
         .xml(path)
 
-      var trans=spark.read.option("rowTag","Transformation").xml(path)
-      var test=""
+      var trans = spark.read.option("rowTag", "Transformation").xml(path)
+      var test = ""
 
-     //test=trans.collectAsList().get(0).getAs[String]("_att")
-
-
-      var a= new util.ArrayList[String]()
+      //test=trans.collectAsList().get(0).getAs[String]("_att")
 
 
-      var  parser = new JSONParser
+      var a = new util.ArrayList[String]()
 
 
-      val LesRichKeyMapping = dftransformation.collectAsList().forEach(t=>{
-
-          types =t.getAs[String]("_type")
-
-          val hTable = new HTable(HbaseConf, Bdciblename)
-          var table_source_name=t.getAs[String]("_tablesource")
-          ColumnQualifier =t.getAs[String]("_columnqualifier")
-          colfamily= ColumnQualifier.split(":").apply(0)
-          colname=ColumnQualifier.split(":").apply(1)
-          mappingformula=t.getAs[String]("_mappingformula")
-          val context = new StandardEvaluationContext()
-          val parsers = new SpelExpressionParser
-          var exp = parsers.parseExpression(mappingformula)
-          var employees_table = spark.read.jdbc(jdbcUrl, table_source_name, connectionProperties)
-          var valueexp= t.getAs[String]("_value")
-          var ignore= t.getAs[Boolean]("_ignore")
-
-          employees_table.toJSON.collectAsList().forEach(row => {
-
-            var json = parser.parse(row).asInstanceOf[org.json.simple.JSONObject]
+      var parser = new JSONParser
+      val context = new StandardEvaluationContext()
+      val parsers = new SpelExpressionParser
 
 
-            var bean = new BeanGenerators(json).setBeanSchema()
-            bean = new BeanGenerators(json).getBean(bean)
-            var keys = json.keySet()
-            context.registerFunction("getAge", classOf[TestService].getDeclaredMethod("getAge", classOf[String]))
-            context.registerFunction("formatNumber", classOf[TestService].getDeclaredMethod("formatNumber", classOf[Double]))
-            context.registerFunction("getcurrency",classOf[TestService].getDeclaredMethod("getcurrency",classOf[String]))
-            keys.forEach(key => {
-              context.setVariable(key.toString, bean.get(key.toString))
-            })
+      var VariablesGlobales= spark.read.option("rootTag","VariablesGlobales")
+        .option("rowTag","vg")
+        .format("com.databricks.spark.xml")
+        .load(path)
+      context.registerFunction("getcurrency", classOf[TestService].getDeclaredMethod("getcurrency", classOf[String]))
+
+
+      VariablesGlobales.collectAsList().forEach(vg=>{
+          var vgformula= vg.getAs[String]("_value")
+          var vgexpression= parsers.parseExpression(vgformula)
+          var vgvalue= vgexpression.getValue(context).asInstanceOf[Double]
+          context.setVariable(vg.getAs[String]("_name"),vgvalue)
+      })
+
+
+
+var table_target_name=""
+
+      val LesRichKeyMapping = dftransformation.collectAsList().forEach(t => {
+
+
+
+        table_source_name = t.getAs[String]("_tablesource")
+        table_target_name=t.getAs[String]("_targettable")
+        ColumnQualifier = t.getAs[String]("_columnqualifier")
+        colfamily = ColumnQualifier.split(":").apply(0)
+        colname = ColumnQualifier.split(":").apply(1)
+        mappingformula = t.getAs[String]("_mappingformula")
+        val hTable = new HTable(HbaseConf, table_target_name)
+
+        var exp = parsers.parseExpression(mappingformula)
+        var current_table = spark.read.jdbc(jdbcUrl, table_source_name, connectionProperties)
+        var condition= t.getAs[String]("_condition")
+        var ignore= t.getAs[Boolean]("_ignore")
+        var expp = parsers.parseExpression(condition)
+
+        current_table.toJSON.collectAsList().forEach(row => {
+
+          var json = parser.parse(row).asInstanceOf[org.json.simple.JSONObject]
+
+
+
+          var bean = new BeanGenerators(json).setBeanSchema()
+          bean = new BeanGenerators(json).getBean(bean)
+          var keys = json.keySet()
+          context.registerFunction("getAge", classOf[TestService].getDeclaredMethod("getAge", classOf[String]))
+          context.registerFunction("formatNumber", classOf[TestService].getDeclaredMethod("formatNumber", classOf[Double]))
+          keys.forEach(key => {
+            context.setVariable(key.toString, bean.get(key.toString))
+          })
             var put = new Put(Bytes.toBytes("row" + bean.toString))
+            var valueCondition = expp.getValue(context).asInstanceOf[Boolean]
 
-            if(types=="Formule") {
-
+          if(valueCondition)
+            {
             var expression = exp.getValue(context).asInstanceOf[String]
-              var put = new Put(Bytes.toBytes("row" + bean.toString))
-
             put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes(expression))
             hTable.put(put)
             }
-
-            else if(types=="condition")
+          else if(!ignore)
             {
-              var expression=exp.getValue(context).asInstanceOf[Boolean]
-              if(expression)
-                {
-                  var expp= parsers.parseExpression(valueexp)
-                  var value=expp.getValue(context).asInstanceOf[String]
-
-                  put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes(value))
-                  test=colfamily
-
-                }
-              else if(ignore==false)
-                {
-                  test="i am here 2"
-
-                  put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes("null"))
-
-                }
+              put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes("null"))
               hTable.put(put)
-
             }
-          })
 
 
+        })
 
-    })
+      })
 
 
-
-    return  "done"
+      return "done"
 
 
     }
 
-     catch {
-         case e: ScriptException => e.printStackTrace
-           return "false"
-       }
-}}
+    catch {
+      case e: ScriptException => e.printStackTrace
+        return "false"
+    }
+  }
+}
