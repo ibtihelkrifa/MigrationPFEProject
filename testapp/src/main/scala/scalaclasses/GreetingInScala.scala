@@ -125,7 +125,6 @@ class GreetingInScala {
 
 
       var parser = new JSONParser
-      val context = new StandardEvaluationContext()
       val parsers = new SpelExpressionParser
 
 
@@ -133,15 +132,15 @@ class GreetingInScala {
         .option("rowTag","vg")
         .format("com.databricks.spark.xml")
         .load(path)
-      context.registerFunction("getcurrency", classOf[TestService].getDeclaredMethod("getcurrency", classOf[String]))
+    //  context.registerFunction("getcurrency", classOf[TestService].getDeclaredMethod("getcurrency", classOf[String]))
 
 
-      VariablesGlobales.collectAsList().forEach(vg=>{
+  /*    VariablesGlobales.collectAsList().forEach(vg=>{
           var vgformula= vg.getAs[String]("_value")
           var vgexpression= parsers.parseExpression(vgformula)
           var vgvalue= vgexpression.getValue(context).asInstanceOf[Double]
           context.setVariable(vg.getAs[String]("_name"),vgvalue)
-      })
+      })*/
 
 
 
@@ -173,12 +172,15 @@ var table_target_name=""
 
           var bean = new BeanGenerators(json).setBeanSchema()
           bean = new BeanGenerators(json).getBean(bean)
-          var keys = json.keySet()
+        //  var keys = json.keySet()
+        val context = new StandardEvaluationContext(bean)
+
+
           context.registerFunction("getAge", classOf[TestService].getDeclaredMethod("getAge", classOf[String]))
           context.registerFunction("formatNumber", classOf[TestService].getDeclaredMethod("formatNumber", classOf[Double]))
-          keys.forEach(key => {
+       /*   keys.forEach(key => {
             context.setVariable(key.toString, bean.get(key.toString))
-          })
+          })*/
             var put = new Put(Bytes.toBytes("row" + bean.toString))
             var valueCondition = expp.getValue(context).asInstanceOf[Boolean]
 

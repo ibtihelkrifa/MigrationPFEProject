@@ -1,22 +1,22 @@
 <debut>
 
-	<source type="mysql">
-		<ip>127.0.0.1</ip>
-		<port>3306</port>
-		<name>TestPFE</name>
-		<user>root</user>
-		<password>root</password>
-	</source>
+    <source type="mysql">
+        <ip>127.0.0.1</ip>
+        <port>3306</port>
+        <name>TestPFE</name>
+        <user>root</user>
+        <password>root</password>
+    </source>
 
-	<cible type="hbase">
-		<ip>127.0.0.1</ip>
-		<port>2181</port>
-	</cible>
+    <cible type="hbase">
+        <ip>127.0.0.1</ip>
+        <port>2181</port>
+    </cible>
 
-	<SCible>
-		<name>EMPLOYEES</name>
-		<cols CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE" />
-	</SCible>
+    <SCible>
+        <name>EMPLOYEES</name>
+        <cols CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE" />
+    </SCible>
 
     <StructuresCibles>
         <StructureCible id="0" name="EMPLOYEES" CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE"/>
@@ -25,39 +25,48 @@
 
     </StructuresCibles>
 
+    <ClientClass>
+        <Function NameClass="com.vermeg.testapp.services.TestService" NameFunction="getAge" InputClass="java.lang.String" />
+        <Function NameClass="com.vermeg.testapp.services.TestService" NameFunction="getcurrency" InputClass="java.lang.String" />
+        <Function NameClass="com.vermeg.testapp.services.TestService" NameFunction="formatNumber" InputClass="java.lang.Double" />
+        <Function NameClass="com.vermeg.testapp.services.TestService" NameFunction="FormatDate" InputClass="java.lang.String" />
 
-	<VariablesGlobales>
-		<vg name="tauxr" value="#getcurrency('http://demo1525832.mockable.io/currency')" />
-	</VariablesGlobales>
+    </ClientClass>
+
+    <VariablesGlobales>
+        <vg name="tauxr" value="#getcurrency('http://demo1525832.mockable.io/currency')" />
+    </VariablesGlobales>
+
+
+    <TablesSources>
+        <Table name="etudiant"/>
+        <Table name="user" />
+        <Table name="address"/>
+    </TablesSources>
 
     <transformations>
-        <transformation id="0" tablesource="etudiant">
-            <RichKeyMapping  targettable="STUDENTS" columnqualifier="FAMILY_STUDENT:nom"   idrow="#numEtudiant"  ignore="true"  condition="1 eq 1 ? true : false"    mappingformula="#nom+' '+#prenom"/>
-            <RichKeyMapping  targettable="STUDENTS" columnqualifier="FAMILY_STUDENT:email" idrow="#numEtudiant" ignore="false"  condition="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' "  mappingformula="#email"/>
-            <RichKeyMapping  targettable="STUDENTS" columnqualifier="FAMILY_STUDENT:age"   idrow="#numEtudiant" ignore="true"  condition="1 eq 1 ? true : false"    mappingformula="#getAge(#birthDate)"/>
-
+        <transformation id="0" tablesource="etudiant" colonnessources="nom,prenom,email,birthDate">
+            <RichKeyMapping  targettable="STUDENTS" columnqualifier="FAMILY_STUDENT:nom"   idrow="#numEtudiant"    mappingformula="#nom+' '+#prenom"/>
+            <RichKeyMapping  targettable="STUDENTS"  columnqualifier="FAMILY_STUDENT:email" idrow="#numEtudiant" strict="true" condition="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' " mappingformula="#email"/>
+            <RichKeyMapping  targettable="STUDENTS" columnqualifier="FAMILY_STUDENT:age"   idrow="#numEtudiant"     mappingformula="#getAge(#birthDate)"/>
         </transformation>
     </transformations>
 
+    <aggregations>
 
+        <aggregation id="0" idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
+                     tablesource="user"  targettable="EMPLOYEES"  >
+            <RichKeyMapping  mappingformula="T(java.lang.String).valueOf(#salaire *#tauxr)" strict="false" condition="#salaire gt 300 ? true : false" columnqualifier="FAMILY_EMPLOYEE:Salaire"/>
 
-<aggregations>
+            <RichKeyMapping  formatters="#taille=#formatNumber(#taille)" mappingformula="T(java.lang.String).valueOf(#taille)"  columnqualifier="FAMILY_EMPLOYEE:Taille"/>
+            <RichKeyMapping  mappingformula="#getAge(#birthDate)"   columnqualifier="FAMILY_EMPLOYEE:Age"/>
+            <RichKeyMapping formatters="#birthDate=#FormatDate(#birthDate)" mappingformula="#birthDate" pattern="#birthDate matches 'MM-dd-yyyy'" strictpattern="true" columnqualifier="FAMILY_EMPLOYEE:BirthDate"/>
+            <RichKeyMapping  mappingformula="#firstName+' '+#lastName"  columnqualifier="FAMILY_EMPLOYEE:FullName"/>
+            <RichKeyMapping  mappingformula="T(java.lang.String).valueOf(#USERId)" columnqualifier="FAMILY_EMPLOYEE:Iduser"/>
+            <RichKeyMapping  type="document" tablesource="address" mappingformula="*" keyJoin=" 'userByUserId = ' + T(java.lang.String).valueOf(#USERId)" columnqualifier="ADDRESS_EMPLOYEE:address"/>
 
-	<aggregation id="0" idrow="T(java.lang.String).valueOf(#USERId)+T(java.lang.String).valueOf(#addressId)"  colonnessources="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire,address.addressId,address.pays,address.ville,address.rue,address.codePostal"
-				 tablesources="user,address" targettable="EMPLOYEES" keyJoin="user.userId=address.userByUserId" >
-        <RichKeyMapping mappingformula="T(java.lang.String).valueOf(#codePostal)" condition="1 eq 1 ? true : false" ignore="true"  columnqualifier="ADDRESS_EMPLOYEE:CodePostal"/>
-        <RichKeyMapping mappingformula="#rue" condition="1 eq 1 ? true : false" ignore="true"  columnqualifier="ADDRESS_EMPLOYEE:Rue"/>
-        <RichKeyMapping mappingformula="#ville" condition="1 eq 1 ? true : false" ignore="true"  columnqualifier="ADDRESS_EMPLOYEE:Ville"/>
-        <RichKeyMapping mappingformula="#pays" condition="1 eq 1 ? true : false" ignore="true"  columnqualifier="ADDRESS_EMPLOYEE:Pays"/>
-        <RichKeyMapping mappingformula="T(java.lang.String).valueOf(#addressId)" ignore="true"  condition="1 eq 1 ? true : false" columnqualifier="ADDRESS_EMPLOYEE:IdAddress"/>
-        <RichKeyMapping mappingformula="#formatNumber(#taille)" condition="#taille ne null ? true : false" ignore="true"  columnqualifier="FAMILY_EMPLOYEE:Taille"/>
-        <RichKeyMapping mappingformula="T(java.lang.String).valueOf(#salaire *#tauxr)" ignore="false"  condition="#salaire gt 300 ? true : false" columnqualifier="FAMILY_EMPLOYEE:Salaire"/>
-        <RichKeyMapping mappingformula="#getAge(#birthDate)" condition="1 eq 1 ? true : false" ignore="true"  columnqualifier="FAMILY_EMPLOYEE:Age"/>
-        <RichKeyMapping mappingformula="#birthDate" condition="#birthDate matches '^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$'" ignore="true"  columnqualifier="FAMILY_EMPLOYEE:BirthDate"/>
-        <RichKeyMapping mappingformula="#firstName+' '+#lastName" condition="1 eq 1 ? true : false" ignore="true"  columnqualifier="FAMILY_EMPLOYEE:FullName"/>
-        <RichKeyMapping mappingformula="T(java.lang.String).valueOf(#USERId)" condition="1 eq 1 ? true : false" ignore="true"  columnqualifier="FAMILY_EMPLOYEE:Iduser"/>
-	</aggregation>
+        </aggregation>
 
-</aggregations>
+    </aggregations>
 
 </debut>

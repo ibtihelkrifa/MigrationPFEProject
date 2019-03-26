@@ -3,6 +3,7 @@ package com.vermeg.testapp.services;
     import org.json.simple.JSONObject;
     import org.json.simple.parser.JSONParser;
 
+    import javax.xml.bind.annotation.XmlType;
     import java.io.BufferedReader;
     import java.io.DataOutput;
     import java.io.IOException;
@@ -41,12 +42,19 @@ public class TestService {
         return String.valueOf(years);
     }
 
-    public  static String formatNumber(double nb) {
 
+
+
+
+    public  static String formatNumber(Double nb) {
+
+        if(nb==null)
+        {
+            nb=Double.valueOf(0);
+        }
         NumberFormat numberFormatter = NumberFormat.getNumberInstance(Locale.FRENCH);
          numberFormatter.setMaximumFractionDigits(2);
-        return String.valueOf(numberFormatter.format(nb));
-
+        return numberFormatter.format(nb);
     }
 
 public static Double getcurrency(String url)
@@ -82,6 +90,24 @@ public static Double getcurrency(String url)
 
     return Double.valueOf(0);
 
+}
+
+
+public static String FormatDate(String Date)
+{
+    SimpleDateFormat sm = new SimpleDateFormat("MM/dd/yyyy");
+    SimpleDateFormat dp= new SimpleDateFormat("yyyy-MM-dd");
+    Date dt = null;
+    try {
+        dt = dp.parse(Date);
+        String strDate = sm.format(dt);
+        return strDate;
+
+
+    } catch (ParseException e) {
+        e.printStackTrace();
+        return "";
+    }
 }
 
 
