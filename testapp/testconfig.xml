@@ -56,7 +56,7 @@
 
         <aggregation id="0" idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
                      tablesource="user"  targettable="EMPLOYEES"  >
-            <RichKeyMapping  mappingformula="T(java.lang.String).valueOf(#salaire *#tauxr)" strict="false" condition="#salaire gt 300 ? true : false" columnqualifier="FAMILY_EMPLOYEE:Salaire"/>
+            <RichKeyMapping  mappingformula="T(java.lang.String).valueOf(#salaire *#tauxr)"  condition="#salaire gt 300 ? true : false" columnqualifier="FAMILY_EMPLOYEE:Salaire"/>
 
             <RichKeyMapping  formatters="#taille=#formatNumber(#taille)" mappingformula="T(java.lang.String).valueOf(#taille)"  columnqualifier="FAMILY_EMPLOYEE:Taille"/>
             <RichKeyMapping  mappingformula="#getAge(#birthDate)"   columnqualifier="FAMILY_EMPLOYEE:Age"/>
