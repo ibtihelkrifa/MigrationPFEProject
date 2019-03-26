@@ -44,17 +44,22 @@
         <Table name="address"/>
     </TablesSources>
 
-    <transformations>
-        <transformation id="0" tablesource="etudiant" colonnessources="nom,prenom,email,birthDate">
-            <RichKeyMapping  targettable="STUDENTS" columnqualifier="FAMILY_STUDENT:nom"   idrow="#numEtudiant"    mappingformula="#nom+' '+#prenom"/>
-            <RichKeyMapping  targettable="STUDENTS"  columnqualifier="FAMILY_STUDENT:email" idrow="#numEtudiant" strict="true" condition="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' " mappingformula="#email"/>
-            <RichKeyMapping  targettable="STUDENTS" columnqualifier="FAMILY_STUDENT:age"   idrow="#numEtudiant"     mappingformula="#getAge(#birthDate)"/>
-        </transformation>
-    </transformations>
+
 
     <aggregations>
 
-        <aggregation id="0" idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
+
+
+        <aggregation id="0" idrow="T(java.lang.String).valueOf(#numEtudiant)"  colonnessources="etudiant.numEtudiant,etudiant.nom,etudiant.prenom,etudiant.email,etudiant.birthDate"
+                     tablesource="etudiant"  targettable="STUDENTS"  >
+            <RichKeyMapping   columnqualifier="FAMILY_STUDENT:Nom"  mappingformula="#nom+' '+#prenom"/>
+            <RichKeyMapping   columnqualifier="FAMILY_STUDENT:email" strictpattern="true" pattern="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' " mappingformula="#email"/>
+            <RichKeyMapping  columnqualifier="FAMILY_STUDENT:age"  mappingformula="#getAge(#birthDate)"/>
+        </aggregation>
+
+
+
+        <aggregation id="1" idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
                      tablesource="user"  targettable="EMPLOYEES"  >
             <RichKeyMapping  mappingformula="T(java.lang.String).valueOf(#salaire *#tauxr)"  condition="#salaire gt 300 ? true : false" columnqualifier="FAMILY_EMPLOYEE:Salaire"/>
 
