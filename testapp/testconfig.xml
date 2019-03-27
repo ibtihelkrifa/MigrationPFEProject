@@ -63,14 +63,13 @@
                      tablesource="user"  targettable="EMPLOYEES"  >
             <RichKeyMapping  mappingformula="T(java.lang.String).valueOf(#salaire *#tauxr)"  condition="#salaire gt 300 ? true : false" columnqualifier="FAMILY_EMPLOYEE:Salaire"/>
 
-            <RichKeyMapping  formatters="#taille=#formatNumber(#taille)" mappingformula="T(java.lang.String).valueOf(#taille)"   columnqualifier="FAMILY_EMPLOYEE:Taille"/>
+            <RichKeyMapping  formatters="#taille=#formatNumber(#taille)" mappingformula="T(java.lang.String).valueOf(#taille)" condition="#taille gt 2 ? true : false"   columnqualifier="FAMILY_EMPLOYEE:Taille"/>
             <RichKeyMapping  mappingformula="#getAge(#birthDate)"   columnqualifier="FAMILY_EMPLOYEE:Age"/>
             <RichKeyMapping  formatters="#birthDate=#FormatDate(#birthDate)" mappingformula="#birthDate" pattern="#birthDate matches '^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$'"
                              columnqualifier="FAMILY_EMPLOYEE:BirthDate"/>
             <RichKeyMapping  mappingformula="#firstName+' '+#lastName"  columnqualifier="FAMILY_EMPLOYEE:FullName"/>
             <RichKeyMapping  mappingformula="T(java.lang.String).valueOf(#USERId)" columnqualifier="FAMILY_EMPLOYEE:Iduser"/>
-            <RichKeyMapping  type="document" tablesource="address" mappingformula="*" keyJoin=" 'userByUserId = ' + T(java.lang.String).valueOf(#USERId)" columnqualifier="ADDRESS_EMPLOYEE:address"/>
-
+            <RichKeyMapping  type="Document" tablesource="address" mappingformula="*" keyJoin=" 'userByUserId = ' + T(java.lang.String).valueOf(#USERId)" columnqualifier="ADDRESS_EMPLOYEE:address"/>
         </aggregation>
 
     </aggregations>

@@ -255,8 +255,8 @@ class TestScalaClass {
                   }
                   else  {
 
-                  //  val d = new Delete(Bytes.toBytes("row" + id))
-                   // hTable.delete(d)
+                    val d = new Delete(Bytes.toBytes("row" + id))
+                    hTable.delete(d)
                     break
 
                   }
@@ -265,7 +265,8 @@ class TestScalaClass {
 
             else {
               var typemap = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("type").getNodeValue
-              if (typemap == "document") {
+
+              if (typemap == "Document") {
                 var tablesourcename = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("tablesource").getNodeValue
 
 
@@ -277,6 +278,7 @@ class TestScalaClass {
                 var dfaggrega = spark.sql("select " + valueexp + " from " + tablesourcename + " where " + keyvalue)
                 var r = 0;
                 dfaggrega.toJSON.collectAsList().forEach(row => {
+
                   var json = parser.parse(row).asInstanceOf[org.json.simple.JSONObject]
                   put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname + " " + r), Bytes.toBytes(json.toJSONString))
                   hTable.put(put)
@@ -284,6 +286,10 @@ class TestScalaClass {
                   r = r + 1;
                 })
               }
+
+
+
+
             }
             g = g + 1
             patternboolean=true
