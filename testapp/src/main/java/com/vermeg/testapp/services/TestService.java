@@ -27,19 +27,33 @@ public class TestService {
     {
         Calendar now = Calendar.getInstance();
         Date birthdate=null;
+
+        if(birthd==null)
+        {
+            return String.valueOf(0);
+        }
+
         try {
-         birthdate = new SimpleDateFormat("mm-dd-yy").parse(birthd);
-    } catch (ParseException e) {
-        e.printStackTrace();
-    }
+
+
+           birthdate = new SimpleDateFormat("yyyy-MM-dd").parse(birthd);
+            Calendar birthDay = Calendar.getInstance();
+            birthDay.setTimeInMillis(birthdate.getTime());
+            //Get difference between years
+            int years = now.get(Calendar.YEAR) - birthDay.get(Calendar.YEAR);
+            return String.valueOf(years);
+           }
+
+        catch (ParseException e) {
+
+         System.out.println(e);
+         return String.valueOf(0);
+
+        }
 
 
 
-        Calendar birthDay = Calendar.getInstance();
-        birthDay.setTimeInMillis(birthdate.getTime());
-        //Get difference between years
-        int years = now.get(Calendar.YEAR) - birthDay.get(Calendar.YEAR);
-        return String.valueOf(years);
+
     }
 
 
@@ -98,7 +112,13 @@ public static String FormatDate(String Date)
     SimpleDateFormat sm = new SimpleDateFormat("MM/dd/yyyy");
     SimpleDateFormat dp= new SimpleDateFormat("yyyy-MM-dd");
     Date dt = null;
+    if(Date==null)
+    {
+        return "";
+    }
+
     try {
+
         dt = dp.parse(Date);
         String strDate = sm.format(dt);
         return strDate;

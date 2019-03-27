@@ -176,11 +176,9 @@ class TestScalaClass {
         var targettable = elementaggrega.getAttribute("targettable")
         val hTable = new HTable(HbaseConf, targettable)
 
-        var idexp = parsers.parseExpression(idrow)
-
 
         val dfaggrega = spark.sql("select " + selectedcolumns + " from " + tablesources)
-        print(dfaggrega.collectAsList().get(0))
+
         dfaggrega.toJSON.collectAsList().forEach(row => {
 
           var json = parser.parse(row).asInstanceOf[org.json.simple.JSONObject]
@@ -188,79 +186,83 @@ class TestScalaClass {
           var bean = new BeanGenerators(json).setBeanSchema()
           bean = new BeanGenerators(json).getBean(bean)
           var keys2 = json.keySet()
+
           keys2.forEach(key => {
             context.setVariable(key.toString, bean.get(key.toString))
           })
 
           var targetcolonneslength = elementaggrega.getElementsByTagName("RichKeyMapping").getLength
-          var g = 0
+
+          var idexp = parsers.parseExpression(idrow)
           var id = idexp.getValue(context).asInstanceOf[String]
           var put = new Put(Bytes.toBytes("row" + id))
 
-
+          var g = 0
           breakable{
+
           while (g < targetcolonneslength) {
             var valueexp = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("mappingformula").getNodeValue
             var colfamily = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(0)
             var colname = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(1)
 
 
-            if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("formatters") != null) {
-              var formatters = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("formatters").getNodeValue
-              var parseformat = parsers.parseExpression(formatters)
-              parseformat.getValue(context).asInstanceOf[java.lang.String]
-            }
+
 
             var pattern = ""
             var patternboolean = true
-            var strictpattern = "true"
-            if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("pattern") != null) {
-              strictpattern = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("strictpattern").getNodeValue
-
-              pattern = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("pattern").getNodeValue
-              var parsepattern = parsers.parseExpression(pattern)
-              if (!parsepattern.getValue(context).asInstanceOf[Boolean] && strictpattern == "false") {
-                patternboolean = false
-              }
-
-
-            }
+            var valueCondition=true
 
 
             if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("type") == null) {
 
 
-              if (patternboolean == true) {
-
-                var valueparse = parsers.parseExpression(valueexp)
-                var finalvalue = valueparse.getValue(context).asInstanceOf[String]
-
-
                 if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("condition") != null) {
                   var condition = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("condition").getNodeValue
                   var expp = parsers.parseExpression(condition)
-                  var valueCondition = expp.getValue(context).asInstanceOf[Boolean]
+                  valueCondition = expp.getValue(context).asInstanceOf[Boolean]
+                }
 
                   if (valueCondition) {
-                    put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes(finalvalue))
-                    hTable.put(put)
+
+
+                    if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("formatters") != null) {
+                      var formatters = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("formatters").getNodeValue
+                      var parseformat = parsers.parseExpression(formatters)
+                      parseformat.getValue(context).asInstanceOf[java.lang.String]
+                    }
+
+
+
+                    if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("pattern") != null) {
+
+                      pattern = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("pattern").getNodeValue
+                      var parsepattern = parsers.parseExpression(pattern).getValue(context).asInstanceOf[Boolean]
+                      if (!parsepattern ) {
+                        patternboolean = false
+                      }
+                    }
+
+
+
+                    if (patternboolean == true) {
+
+                      var valueparse = parsers.parseExpression(valueexp)
+                      var finalvalue = valueparse.getValue(context).asInstanceOf[String]
+                      put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes(finalvalue))
+                      hTable.put(put)
+                    }
 
                   }
                   else  {
 
-                   // val d = new Delete(Bytes.toBytes("row" + id))
-
-                    //hTable.delete(d)
+                  //  val d = new Delete(Bytes.toBytes("row" + id))
+                   // hTable.delete(d)
                     break
 
                   }
-                }
-                else {
-                  put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes(finalvalue))
-                  hTable.put(put)
-                }
+
               }
-            }
+
             else {
               var typemap = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("type").getNodeValue
               if (typemap == "document") {
@@ -284,12 +286,17 @@ class TestScalaClass {
               }
             }
             g = g + 1
-
-
-
+            patternboolean=true
           }
+
         }
+          keys2.forEach(key => {
+            context.setVariable(key.toString, null)
+          })
+
         })
+
+
         k = k + 1
       }
       return test
