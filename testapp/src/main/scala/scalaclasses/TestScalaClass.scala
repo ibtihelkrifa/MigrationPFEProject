@@ -81,7 +81,7 @@ class TestScalaClass {
     var s = 0
     var c = 0
     var nc = 0
-     var test=""
+    var test=""
     var parser = new JSONParser
     val context = new StandardEvaluationContext()
     val parsers = new SpelExpressionParser
@@ -174,6 +174,10 @@ class TestScalaClass {
         tablesources = elementaggrega.getAttribute("tablesource")
         selectedcolumns = elementaggrega.getAttribute("colonnessources")
         var targettable = elementaggrega.getAttribute("targettable")
+
+
+
+
         val hTable = new HTable(HbaseConf, targettable)
 
 
@@ -200,20 +204,19 @@ class TestScalaClass {
           var g = 0
           breakable{
 
-          while (g < targetcolonneslength) {
-            var valueexp = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("mappingformula").getNodeValue
-            var colfamily = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(0)
-            var colname = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(1)
+            while (g < targetcolonneslength) {
+              var valueexp = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("mappingformula").getNodeValue
+              var colfamily = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(0)
+              var colname = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(1)
 
 
 
+              var pattern = ""
+              var patternboolean = true
+              var valueCondition=true
 
-            var pattern = ""
-            var patternboolean = true
-            var valueCondition=true
 
-
-            if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("type") == null) {
+              if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("type") == null) {
 
 
                 if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("condition") != null) {
@@ -222,80 +225,80 @@ class TestScalaClass {
                   valueCondition = expp.getValue(context).asInstanceOf[Boolean]
                 }
 
-                  if (valueCondition) {
+                if (valueCondition) {
 
 
-                    if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("formatters") != null) {
-                      var formatters = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("formatters").getNodeValue
-                      var parseformat = parsers.parseExpression(formatters)
-                      parseformat.getValue(context).asInstanceOf[java.lang.String]
-                    }
-
-
-
-                    if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("pattern") != null) {
-
-                      pattern = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("pattern").getNodeValue
-                      var parsepattern = parsers.parseExpression(pattern).getValue(context).asInstanceOf[Boolean]
-                      if (!parsepattern ) {
-                        patternboolean = false
-                      }
-                    }
-
-
-
-                    if (patternboolean == true) {
-
-                      var valueparse = parsers.parseExpression(valueexp)
-                      var finalvalue = valueparse.getValue(context).asInstanceOf[String]
-                      put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes(finalvalue))
-                      hTable.put(put)
-                    }
-
+                  if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("formatters") != null) {
+                    var formatters = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("formatters").getNodeValue
+                    var parseformat = parsers.parseExpression(formatters)
+                    parseformat.getValue(context).asInstanceOf[java.lang.String]
                   }
-                  else  {
 
-                    val d = new Delete(Bytes.toBytes("row" + id))
-                    hTable.delete(d)
-                    break
 
+
+                  if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("pattern") != null) {
+
+                    pattern = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("pattern").getNodeValue
+                    var parsepattern = parsers.parseExpression(pattern).getValue(context).asInstanceOf[Boolean]
+                    if (!parsepattern ) {
+                      patternboolean = false
+                    }
                   }
+
+
+
+                  if (patternboolean == true) {
+
+                    var valueparse = parsers.parseExpression(valueexp)
+                    var finalvalue = valueparse.getValue(context).asInstanceOf[String]
+                    put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes(finalvalue))
+                    hTable.put(put)
+                  }
+
+                }
+                else  {
+
+                  val d = new Delete(Bytes.toBytes("row" + id))
+                  hTable.delete(d)
+                  break
+
+                }
 
               }
 
-            else {
-              var typemap = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("type").getNodeValue
+              else {
+                var typemap = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("type").getNodeValue
 
-              if (typemap == "Document") {
-                var tablesourcename = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("tablesource").getNodeValue
+                if (typemap == "Document") {
+                  var tablesourcename = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("tablesource").getNodeValue
 
 
-                var keyjoin = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("keyJoin").getNodeValue
-                var exppkey = parsers.parseExpression(keyjoin)
+                  var keyjoin = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("keyJoin").getNodeValue
+                  var exppkey = parsers.parseExpression(keyjoin)
 
-                var keyvalue = exppkey.getValue(context).asInstanceOf[String]
+                  var keyvalue = exppkey.getValue(context).asInstanceOf[String]
 
-                var dfaggrega = spark.sql("select " + valueexp + " from " + tablesourcename + " where " + keyvalue)
-                var r = 0;
-                dfaggrega.toJSON.collectAsList().forEach(row => {
+                  var dfaggrega = spark.sql("select " + valueexp + " from " + tablesourcename + " where " + keyvalue)
+                  var r = 0;
+                  dfaggrega.toJSON.collectAsList().forEach(row => {
 
-                  var json = parser.parse(row).asInstanceOf[org.json.simple.JSONObject]
-                  put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname + " " + r), Bytes.toBytes(json.toJSONString))
-                  hTable.put(put)
+                    var json = parser.parse(row).asInstanceOf[org.json.simple.JSONObject]
+                    put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname + " " + r), Bytes.toBytes(json.toJSONString))
+                    hTable.put(put)
 
-                  r = r + 1;
-                })
+                    r = r + 1;
+                  })
+                }
+
+
+
+
               }
-
-
-
-
+              g = g + 1
+              patternboolean=true
             }
-            g = g + 1
-            patternboolean=true
-          }
 
-        }
+          }
           keys2.forEach(key => {
             context.setVariable(key.toString, null)
           })
@@ -305,7 +308,7 @@ class TestScalaClass {
 
         k = k + 1
       }
-      return test
+      return aggregListlength.toString
     }
 
     catch {

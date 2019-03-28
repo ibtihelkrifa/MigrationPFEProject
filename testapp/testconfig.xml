@@ -23,6 +23,8 @@
 
         <StructureCible id="1" name="STUDENTS" CF="FAMILY_STUDENT;NOTE_STUDENT"/>
 
+        <StructureCible id="3" name="DEPARTEMENT" CF="DEPARTEMENT_DETAILS" />
+
     </StructuresCibles>
 
     <ClientClass>
@@ -42,6 +44,7 @@
         <Table name="etudiant"/>
         <Table name="user" />
         <Table name="address"/>
+        <Table  name="departement"/>
     </TablesSources>
 
 
@@ -50,27 +53,56 @@
 
 
 
-        <aggregation id="0" idrow="T(java.lang.String).valueOf(#numEtudiant)"  colonnessources="etudiant.numEtudiant,etudiant.nom,etudiant.prenom,etudiant.email,etudiant.birthDate"
+        <aggregation type="racine" id="0" idrow="T(java.lang.String).valueOf(#numEtudiant)"  colonnessources="etudiant.numEtudiant,etudiant.nom,etudiant.prenom,etudiant.email,etudiant.birthDate"
                      tablesource="etudiant"  targettable="STUDENTS"  >
-            <RichKeyMapping   columnqualifier="FAMILY_STUDENT:Nom"  mappingformula="#nom+' '+#prenom"/>
-            <RichKeyMapping   columnqualifier="FAMILY_STUDENT:email" strictpattern="true" pattern="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' " mappingformula="#email"/>
-            <RichKeyMapping  columnqualifier="FAMILY_STUDENT:age"  mappingformula="#getAge(#birthDate)"/>
+            <RichKeyMapping father="0"  columnqualifier="FAMILY_STUDENT:Nom"  mappingformula="#nom+' '+#prenom"/>
+            <RichKeyMapping  father="0" columnqualifier="FAMILY_STUDENT:email" strictpattern="true" pattern="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' " mappingformula="#email"/>
+            <RichKeyMapping father="0" columnqualifier="FAMILY_STUDENT:age"  mappingformula="#getAge(#birthDate)"/>
         </aggregation>
 
 
 
-        <aggregation id="1" idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
+
+
+
+        <aggregation type="racine" id="1" idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
                      tablesource="user"  targettable="EMPLOYEES"  >
-            <RichKeyMapping  mappingformula="T(java.lang.String).valueOf(#salaire *#tauxr)"  condition="#salaire gt 300 ? true : false" columnqualifier="FAMILY_EMPLOYEE:Salaire"/>
+            <RichKeyMapping   father="1" mappingformula="T(java.lang.String).valueOf(#salaire *#tauxr)"  condition="#salaire gt 300 ? true : false" columnqualifier="FAMILY_EMPLOYEE:Salaire"/>
 
-            <RichKeyMapping  formatters="#taille=#formatNumber(#taille)" mappingformula="T(java.lang.String).valueOf(#taille)" condition="#taille gt 2 ? true : false"   columnqualifier="FAMILY_EMPLOYEE:Taille"/>
-            <RichKeyMapping  mappingformula="#getAge(#birthDate)"   columnqualifier="FAMILY_EMPLOYEE:Age"/>
-            <RichKeyMapping  formatters="#birthDate=#FormatDate(#birthDate)" mappingformula="#birthDate" pattern="#birthDate matches '^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$'"
-                             columnqualifier="FAMILY_EMPLOYEE:BirthDate"/>
-            <RichKeyMapping  mappingformula="#firstName+' '+#lastName"  columnqualifier="FAMILY_EMPLOYEE:FullName"/>
-            <RichKeyMapping  mappingformula="T(java.lang.String).valueOf(#USERId)" columnqualifier="FAMILY_EMPLOYEE:Iduser"/>
-            <RichKeyMapping  type="Document" tablesource="address" mappingformula="*" keyJoin=" 'userByUserId = ' + T(java.lang.String).valueOf(#USERId)" columnqualifier="ADDRESS_EMPLOYEE:address"/>
+            <RichKeyMapping  father="1" formatters="#taille=#formatNumber(#taille)" mappingformula="T(java.lang.String).valueOf(#taille)" condition="#taille gt 2 ? true : false"   columnqualifier="FAMILY_EMPLOYEE:Taille"/>
+            <RichKeyMapping  father="1" mappingformula="#getAge(#birthDate)"   columnqualifier="FAMILY_EMPLOYEE:Age"/>
+            <RichKeyMapping  father="1" formatters="#birthDate=#FormatDate(#birthDate)" mappingformula="#birthDate" pattern="#birthDate matches '^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$'"
+                            columnqualifier="FAMILY_EMPLOYEE:BirthDate"/>
+            <RichKeyMapping  father="1" mappingformula="#firstName+' '+#lastName"  columnqualifier="FAMILY_EMPLOYEE:FullName"/>
+            <RichKeyMapping  father="1" mappingformula="T(java.lang.String).valueOf(#USERId)" columnqualifier="FAMILY_EMPLOYEE:Iduser"/>
+
+            <aggregation  id="2" father="1"  idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
+                         tableintermediaire="null" keyjoinint="null" keyjoin="'userByUserId = ' + T(java.lang.String).valueOf(#USERId)"  tablesource="address"  targettable="EMPLOYEES">
+
+                <RichKeyMapping father="2" type="Document"  mappingformula="*" columnqualifier="ADDRESS_EMPLOYEE:address"/>
+
+            </aggregation>
+
+
+            <aggregation type="racine" id="3" idrow="T(java.lang.String).valueOf(#idDept)"  colonnessources="idDept,nomDept"
+                         tablesource="departement"  targettable="DEPARTEMENT"  >
+
+                <RichKeyMapping  father="3" mappingformula="T(java.lang.String).valueOf(#idDept)"   columnqualifier="DEPARTEMENT_DETAILS:iddepartement"/>
+                <RichKeyMapping  father="3" mappingformula="#nomDept"   columnqualifier="DEPARTEMENT_DETAILS:nomdepartement"/>
+
+            </aggregation>
+
         </aggregation>
+
+
+
+
+
+
+
+
+
+
 
     </aggregations>
 

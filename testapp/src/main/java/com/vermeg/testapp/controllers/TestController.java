@@ -5,6 +5,8 @@ import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.springframework.web.bind.annotation.*;
 import scalaclasses.GreetingInScala;
+import scalaclasses.RecursiveClass;
+import scalaclasses.Test4;
 import scalaclasses.TestScalaClass;
 
 @RestController
@@ -23,6 +25,14 @@ public class TestController {
     public String configure2( )
     {
         return  new TestScalaClass().configure2("/home/ibtihel/Desktop/PFE/testapp/testconfig.xml");
+        //return "hello";
+    }
+
+
+    @GetMapping("test4/")
+    public String function2( )
+    {
+         return new Test4().function();
         //return "hello";
     }
 
