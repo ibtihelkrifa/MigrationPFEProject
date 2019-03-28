@@ -45,6 +45,7 @@
         <Table name="user" />
         <Table name="address"/>
         <Table  name="departement"/>
+        <Table name="addressdetails" />
     </TablesSources>
 
 
@@ -76,30 +77,30 @@
             <RichKeyMapping  father="1" mappingformula="#firstName+' '+#lastName"  columnqualifier="FAMILY_EMPLOYEE:FullName"/>
             <RichKeyMapping  father="1" mappingformula="T(java.lang.String).valueOf(#USERId)" columnqualifier="FAMILY_EMPLOYEE:Iduser"/>
 
+
             <aggregation  id="2" father="1"  idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
                          tableintermediaire="null" keyjoinint="null" keyjoin="'userByUserId = ' + T(java.lang.String).valueOf(#USERId)"  tablesource="address"  targettable="EMPLOYEES">
 
                 <RichKeyMapping father="2" type="Document"  mappingformula="*" columnqualifier="ADDRESS_EMPLOYEE:address"/>
 
-            </aggregation>
+                <aggregation id="3" father="2" idrow="T(java.lang.String).valueOf(#USERId)" colonnessources="id_detail, nom_detail, address_id"
+                      keyjoin="'address_id =' + T(java.lang.String).valueOf(#addressId)" tablesource="addressdetails" targettable="EMPLOYEES">
+                    <RichKeyMapping father="3" type="Document" mappingformula="*" columnqualifier="ADDRESS_EMPLOYEE:details"/>
 
-
-            <aggregation type="racine" id="3" idrow="T(java.lang.String).valueOf(#idDept)"  colonnessources="idDept,nomDept"
-                         tablesource="departement"  targettable="DEPARTEMENT"  >
-
-                <RichKeyMapping  father="3" mappingformula="T(java.lang.String).valueOf(#idDept)"   columnqualifier="DEPARTEMENT_DETAILS:iddepartement"/>
-                <RichKeyMapping  father="3" mappingformula="#nomDept"   columnqualifier="DEPARTEMENT_DETAILS:nomdepartement"/>
+                </aggregation>
 
             </aggregation>
 
         </aggregation>
 
 
+        <aggregation type="racine" id="4" idrow="T(java.lang.String).valueOf(#idDept)"  colonnessources="idDept,nomDept"
+                         tablesource="departement"  targettable="DEPARTEMENT"  >
 
+                <RichKeyMapping  father="4" mappingformula="T(java.lang.String).valueOf(#idDept)"   columnqualifier="DEPARTEMENT_DETAILS:iddepartement"/>
+                <RichKeyMapping  father="4" mappingformula="#nomDept"   columnqualifier="DEPARTEMENT_DETAILS:nomdepartement"/>
 
-
-
-
+            </aggregation>
 
 
 

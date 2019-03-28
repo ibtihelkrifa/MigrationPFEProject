@@ -178,6 +178,10 @@ def function():String=
 
     var dfaggrega = spark.sql("select " + colonnessources + " from " + tablesource )
 
+    if(keyjoin.length> " ".length)
+    {
+         dfaggrega=spark.sql("select " + colonnessources + " from " + tablesource + " where " + keyjoin)
+    }
 
     val conn = ConnectionFactory.createConnection(HbaseConf)
     val hAdmin = conn.getAdmin
@@ -188,7 +192,7 @@ def function():String=
 
     var g=0;
 
-
+   var r=0
         dfaggrega.toJSON.collectAsList().forEach(row => {
 
          var g=0
@@ -232,18 +236,11 @@ def function():String=
 
           else if(richnode.getAttributes.getNamedItem("type").getNodeValue == "Document" )
             {
-              dfaggrega = spark.sql("select " + colonnessources + " from " + tablesource + " where " + keyjoin )
-              var r = 0;
-              dfaggrega.toJSON.collectAsList().forEach(row => {
 
-
-                var json = parser.parse(row).asInstanceOf[org.json.simple.JSONObject]
                 put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname + " " + r), Bytes.toBytes(json.toJSONString))
                 hTable.put(put)
 
-                r = r + 1;
-              })
-              test=test+1
+               r=r+1
             }
 
 
@@ -270,7 +267,7 @@ def function():String=
 
                 subinc=subinc+1
                 aggregation(id.toInt,idrow,tablesource,colonnessources,targettable,numberparentaggregations,keyjoinvalue)
-
+                r=0
 
                 keyjoin=""
 
@@ -293,7 +290,9 @@ def function():String=
          var colonnessources=element.getAttributes.getNamedItem("colonnessources").getNodeValue
          var targettable=element.getAttributes.getNamedItem("targettable").getNodeValue
          var keyjoin=""
+
          aggregation(id.toInt,idrow,tablesource,colonnessources,targettable,numberparentaggregations, keyjoin)
+         r=0
        }
 
 
