@@ -4,10 +4,7 @@ package com.vermeg.testapp.controllers;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.springframework.web.bind.annotation.*;
-import scalaclasses.GreetingInScala;
-import scalaclasses.RecursiveClass;
-import scalaclasses.Test4;
-import scalaclasses.TestScalaClass;
+import scalaclasses.*;
 
 @RestController
 @RequestMapping("/")
@@ -28,6 +25,13 @@ public class TestController {
         //return "hello";
     }
 
+
+    @GetMapping("test3/")
+    public String functioon2( )
+    {
+        return new Test5().functioon2();
+        //return "hello";
+    }
 
     @GetMapping("test4/")
     public String function2( )
