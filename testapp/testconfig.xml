@@ -13,10 +13,6 @@
         <port>2181</port>
     </cible>
 
-    <SCible>
-        <name>EMPLOYEES</name>
-        <cols CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE" />
-    </SCible>
 
     <StructuresCibles>
         <StructureCible id="0" name="EMPLOYEES" CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE"/>
@@ -73,18 +69,18 @@
             <RichKeyMapping  father="1" formatters="#taille=#formatNumber(#taille)" mappingformula="T(java.lang.String).valueOf(#taille)" condition="#taille gt 2 ? true : false"   columnqualifier="FAMILY_EMPLOYEE:Taille"/>
             <RichKeyMapping  father="1" mappingformula="#getAge(#birthDate)"   columnqualifier="FAMILY_EMPLOYEE:Age"/>
             <RichKeyMapping  father="1" formatters="#birthDate=#FormatDate(#birthDate)" mappingformula="#birthDate" pattern="#birthDate matches '^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$'"
-                            columnqualifier="FAMILY_EMPLOYEE:BirthDate"/>
+                             columnqualifier="FAMILY_EMPLOYEE:BirthDate"/>
             <RichKeyMapping  father="1" mappingformula="#firstName+' '+#lastName"  columnqualifier="FAMILY_EMPLOYEE:FullName"/>
             <RichKeyMapping  father="1" mappingformula="T(java.lang.String).valueOf(#USERId)" columnqualifier="FAMILY_EMPLOYEE:Iduser"/>
 
 
             <aggregation  id="2" father="1"  idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
-                         tableintermediaire="null" keyjoinint="null" keyjoin="'userByUserId = ' + T(java.lang.String).valueOf(#USERId)"  tablesource="address"  targettable="EMPLOYEES">
+                          tableintermediaire="null" keyjoinint="null" keyjoin="'userByUserId = ' + T(java.lang.String).valueOf(#USERId)"  tablesource="address"  targettable="EMPLOYEES">
 
                 <RichKeyMapping father="2" type="Document"  mappingformula="*" columnqualifier="ADDRESS_EMPLOYEE:address"/>
 
                 <aggregation id="3" father="2" idrow="T(java.lang.String).valueOf(#USERId)" colonnessources="id_detail, nom_detail, address_id"
-                      keyjoin="'address_id =' + T(java.lang.String).valueOf(#addressId)" tablesource="addressdetails" targettable="EMPLOYEES">
+                             keyjoin="'address_id =' + T(java.lang.String).valueOf(#addressId)" tablesource="addressdetails" targettable="EMPLOYEES">
                     <RichKeyMapping father="3" type="Document" mappingformula="*" columnqualifier="ADDRESS_EMPLOYEE:details"/>
 
                 </aggregation>
@@ -94,13 +90,16 @@
         </aggregation>
 
 
+
+
+
         <aggregation type="racine" id="4" idrow="T(java.lang.String).valueOf(#idDept)"  colonnessources="idDept,nomDept"
-                         tablesource="departement"  targettable="DEPARTEMENT"  >
+                     tablesource="departement"  targettable="DEPARTEMENT"  >
 
-                <RichKeyMapping  father="4" mappingformula="T(java.lang.String).valueOf(#idDept)"   columnqualifier="DEPARTEMENT_DETAILS:iddepartement"/>
-                <RichKeyMapping  father="4" mappingformula="#nomDept"   columnqualifier="DEPARTEMENT_DETAILS:nomdepartement"/>
+            <RichKeyMapping  father="4" mappingformula="T(java.lang.String).valueOf(#idDept)"   columnqualifier="DEPARTEMENT_DETAILS:iddepartement"/>
+            <RichKeyMapping  father="4" mappingformula="#nomDept"   columnqualifier="DEPARTEMENT_DETAILS:nomdepartement"/>
 
-            </aggregation>
+        </aggregation>
 
 
 
