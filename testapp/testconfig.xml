@@ -3,7 +3,7 @@
     <source type="mysql">
         <ip>127.0.0.1</ip>
         <port>3306</port>
-        <name>TestPFE</name>
+        <nom>TestPFE</nom>
         <user>root</user>
         <password>root</password>
     </source>
@@ -15,95 +15,95 @@
 
 
     <StructuresCibles>
-        <StructureCible id="0" name="EMPLOYEES" CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE"/>
+        <StructureCible id="0" nom="EMPLOYEES" CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE"/>
 
-        <StructureCible id="1" name="STUDENTS" CF="FAMILY_STUDENT;NOTE_STUDENT"/>
+        <StructureCible id="1" nom="STUDENTS" CF="FAMILY_STUDENT;NOTE_STUDENT"/>
 
-        <StructureCible id="3" name="DEPARTEMENT" CF="DEPARTEMENT_DETAILS" />
+        <StructureCible id="3" nom="DEPARTEMENT" CF="DEPARTEMENT_DETAILS" />
 
     </StructuresCibles>
 
-    <ClientClass>
-        <Function NameClass="com.vermeg.testapp.services.TestService" NameFunction="getAge" InputClass="java.lang.String" />
-        <Function NameClass="com.vermeg.testapp.services.TestService" NameFunction="getcurrency" InputClass="java.lang.String" />
-        <Function NameClass="com.vermeg.testapp.services.TestService" NameFunction="formatNumber" InputClass="java.lang.Double" />
-        <Function NameClass="com.vermeg.testapp.services.TestService" NameFunction="FormatDate" InputClass="java.lang.String" />
+    <FonctionClient>
+        <Fonction nomclasse="com.vermeg.testapp.services.TestService" nomfonction="getAge" InputClass="java.lang.String" />
+        <Fonction nomclasse="com.vermeg.testapp.services.TestService" nomfonction="getcurrency" InputClass="java.lang.String" />
+        <Fonction nomclasse="com.vermeg.testapp.services.TestService" nomfonction="formatNumber" InputClass="java.lang.Double" />
+        <Fonction nomclasse="com.vermeg.testapp.services.TestService" nomfonction="FormatDate" InputClass="java.lang.String" />
 
-    </ClientClass>
+    </FonctionClient>
 
     <VariablesGlobales>
-        <vg name="tauxr" value="#getcurrency('http://demo1525832.mockable.io/currency')" />
+        <vg nom="tauxr" value="#getcurrency('http://demo1525832.mockable.io/currency')" />
     </VariablesGlobales>
 
 
     <TablesSources>
-        <Table name="etudiant"/>
-        <Table name="user" />
-        <Table name="address"/>
-        <Table  name="departement"/>
-        <Table name="addressdetails" />
+        <Table nom="etudiant"/>
+        <Table nom="user" />
+        <Table nom="address"/>
+        <Table nom="departement"/>
+        <Table nom="addressdetails" />
     </TablesSources>
 
 
 
-    <aggregations>
+    <Transformations>
 
 
 
-        <aggregation type="racine" id="0" idrow="T(java.lang.String).valueOf(#numEtudiant)"  colonnessources="etudiant.numEtudiant,etudiant.nom,etudiant.prenom,etudiant.email,etudiant.birthDate"
-                     tablesource="etudiant"  targettable="STUDENTS"  >
-            <RichKeyMapping father="0"  columnqualifier="FAMILY_STUDENT:Nom"  mappingformula="#nom+' '+#prenom"/>
-            <RichKeyMapping  father="0" columnqualifier="FAMILY_STUDENT:email" strictpattern="true" pattern="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' " mappingformula="#email"/>
-            <RichKeyMapping father="0" columnqualifier="FAMILY_STUDENT:age"  mappingformula="#getAge(#birthDate)"/>
-        </aggregation>
-
-
-
-
-
-
-        <aggregation type="racine" id="1" idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
-                     tablesource="user"  targettable="EMPLOYEES"  >
-            <RichKeyMapping   father="1" mappingformula="T(java.lang.String).valueOf(#salaire *#tauxr)"  condition="#salaire gt 300 ? true : false" columnqualifier="FAMILY_EMPLOYEE:Salaire"/>
-
-            <RichKeyMapping  father="1" formatters="#taille=#formatNumber(#taille)" mappingformula="T(java.lang.String).valueOf(#taille)" condition="#taille gt 2 ? true : false"   columnqualifier="FAMILY_EMPLOYEE:Taille"/>
-            <RichKeyMapping  father="1" mappingformula="#getAge(#birthDate)"   columnqualifier="FAMILY_EMPLOYEE:Age"/>
-            <RichKeyMapping  father="1" formatters="#birthDate=#FormatDate(#birthDate)" mappingformula="#birthDate" pattern="#birthDate matches '^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$'"
-                             columnqualifier="FAMILY_EMPLOYEE:BirthDate"/>
-            <RichKeyMapping  father="1" mappingformula="#firstName+' '+#lastName"  columnqualifier="FAMILY_EMPLOYEE:FullName"/>
-            <RichKeyMapping  father="1" mappingformula="T(java.lang.String).valueOf(#USERId)" columnqualifier="FAMILY_EMPLOYEE:Iduser"/>
-
-
-            <aggregation  id="2" father="1"  idrow="T(java.lang.String).valueOf(#USERId)"  colonnessources="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
-                          tableintermediaire="null" keyjoinint="null" keyjoin="'userByUserId = ' + T(java.lang.String).valueOf(#USERId)"  tablesource="address"  targettable="EMPLOYEES">
-
-                <RichKeyMapping father="2" type="Document"  mappingformula="*" columnqualifier="ADDRESS_EMPLOYEE:address"/>
-
-                <aggregation id="3" father="2" idrow="T(java.lang.String).valueOf(#USERId)" colonnessources="id_detail, nom_detail, address_id"
-                             keyjoin="'address_id =' + T(java.lang.String).valueOf(#addressId)" tablesource="addressdetails" targettable="EMPLOYEES">
-                    <RichKeyMapping father="3" type="Document" mappingformula="*" columnqualifier="ADDRESS_EMPLOYEE:details"/>
-
-                </aggregation>
-
-            </aggregation>
-
-        </aggregation>
+        <Transformation type="racine" id="0" idLigne="#numEtudiant" structuresource="etudiant.numEtudiant,etudiant.nom,etudiant.prenom,etudiant.email,etudiant.birthDate"
+                        structurecible="FAMILY_STUDENT:Nom,FAMILY_STUDENT:email,FAMILY_STUDENT:age" tablesource="etudiant" tablecible="STUDENTS"  >
+            <CartographieCle pere="0" colonnesource="nom,prenom" colonnecible="FAMILY_STUDENT:Nom" cartographieformule="#nom+' '+#prenom"/>
+            <CartographieCle pere="0" colonnesource="email" colonnecible="FAMILY_STUDENT:email" strictpattern="true" pattern="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' " cartographieformule="#email"/>
+            <CartographieCle pere="0" colonnesource="birthDate" colonnecible="FAMILY_STUDENT:age" cartographieformule="#getAge(#birthDate)"/>
+        </Transformation>
 
 
 
 
 
-        <aggregation type="racine" id="4" idrow="T(java.lang.String).valueOf(#idDept)"  colonnessources="idDept,nomDept"
-                     tablesource="departement"  targettable="DEPARTEMENT"  >
 
-            <RichKeyMapping  father="4" mappingformula="T(java.lang.String).valueOf(#idDept)"   columnqualifier="DEPARTEMENT_DETAILS:iddepartement"/>
-            <RichKeyMapping  father="4" mappingformula="#nomDept"   columnqualifier="DEPARTEMENT_DETAILS:nomdepartement"/>
+        <Transformation type="racine" id="1" idLigne="#USERId" structuresource="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
+                        structurecible="FAMILY_EMPLOYEE:Salaire,FAMILY_EMPLOYEE:Taille,FAMILY_EMPLOYEE:Age,FAMILY_EMPLOYEE:BirthDate,FAMILY_EMPLOYEE:FullName,FAMILY_EMPLOYEE:Iduser" tablesource="user" tablecible="EMPLOYEES"  >
+            <CartographieCle pere="1" colonnesource="salaire" cartographieformule="T(java.lang.String).valueOf(#salaire *#tauxr)" condition="#salaire gt 300 ? true : false" colonnecible="FAMILY_EMPLOYEE:Salaire"/>
 
-        </aggregation>
+            <CartographieCle pere="1" colonnesource="taille" formatters="#taille=#formatNumber(#taille)" cartographieformule="T(java.lang.String).valueOf(#taille)" condition="#taille gt 2 ? true : false" colonnecible="FAMILY_EMPLOYEE:Taille"/>
+            <CartographieCle pere="1" colonnesource="birthDate" cartographieformule="#getAge(#birthDate)" colonnecible="FAMILY_EMPLOYEE:Age"/>
+            <CartographieCle pere="1" colonnesource="birthDate" formatters="#birthDate=#FormatDate(#birthDate)" cartographieformule="#birthDate" pattern="#birthDate matches '^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$'"
+                             colonnecible="FAMILY_EMPLOYEE:BirthDate"/>
+            <CartographieCle pere="1" colonnesource="FirstName,LastName" cartographieformule="#firstName+' '+#lastName" colonnecible="FAMILY_EMPLOYEE:FullName"/>
+            <CartographieCle pere="1" cartographieformule="T(java.lang.String).valueOf(#USERId)" colonnecible="FAMILY_EMPLOYEE:Iduser"/>
+
+
+            <Transformation id="2" pere="1" idLigne="#USERId" structuresource="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
+                            structurecible="ADDRESS_EMPLOYEE:address" tableintermediaire="null" keyjoinint="null" CleJointure="'userByUserId = ' + T(java.lang.String).valueOf(#USERId)" tablesource="address" tablecible="EMPLOYEES">
+
+                <CartographieCle pere="2" colonnesource="*" type="Document" cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:address"/>
+
+                <Transformation id="3" pere="2" idLigne="#USERId" structuresource="id_detail, nom_detail, address_id"
+                                structurecible="ADDRESS_EMPLOYEE:details" CleJointure="'address_id =' + T(java.lang.String).valueOf(#addressId)" tablesource="addressdetails" tablecible="EMPLOYEES">
+                    <CartographieCle pere="3" colonnesource="*" type="Document" cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:details"/>
+
+                </Transformation>
+
+            </Transformation>
+
+        </Transformation>
 
 
 
 
-    </aggregations>
+
+        <Transformation type="racine" id="4" idLigne="#idDept" structuresource="idDept,nomDept"
+                        structurecible="DEPARTEMENT_DETAILS:iddepartement,DEPARTEMENT_DETAILS:nomdepartemebt" tablesource="departement" tablecible="DEPARTEMENT"  >
+
+            <CartographieCle pere="4" colonnesource="idDept" cartographieformule="T(java.lang.String).valueOf(#idDept)" colonnecible="DEPARTEMENT_DETAILS:iddepartement"/>
+            <CartographieCle pere="4" colonnesource="nomDept" cartographieformule="#nomDept" colonnecible="DEPARTEMENT_DETAILS:nomdepartement"/>
+
+        </Transformation>
+
+
+
+
+    </Transformations>
 
 </debut>

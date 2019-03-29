@@ -27,9 +27,9 @@ public class TestController {
 
 
     @GetMapping("test3/")
-    public String functioon2( )
+    public String Configurer( )
     {
-        return new Test5().functioon2();
+        return new Test5().Configurer("/home/ibtihel/Desktop/PFE/testapp/testconfig.xml");
         //return "hello";
     }
 

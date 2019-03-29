@@ -43,7 +43,7 @@ class TestScalaClass {
 
     df.createOrReplaceTempView("xmltable");
 
-    val source = spark.sql("""select xmltable.source.ip, xmltable.source.port,xmltable.source.name,xmltable.source.user,xmltable.source.password from xmltable """);
+    val source = spark.sql("""select xmltable.source.ip, xmltable.source.port,xmltable.source.nom,xmltable.source.user,xmltable.source.password from xmltable """);
     val ip = source.collectAsList().get(0).get(0).toString
     val port = source.collectAsList().get(0).get(1).toString
     val nameBd = source.collectAsList().get(0).get(2).toString
@@ -95,7 +95,7 @@ class TestScalaClass {
 
       s = 0
       while (s < stciblelength) {
-        var stciblename = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("name").getNodeValue
+        var stciblename = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("nom").getNodeValue
         var cfnames = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("CF").getNodeValue
         val tableDescriptor = new HTableDescriptor(TableName.valueOf(stciblename))
         val nbcf = cfnames.split(";").length
@@ -122,7 +122,7 @@ class TestScalaClass {
       var tb=0
       while(tb<nbtablessources)
       {
-        var tablename = xpath.evaluate("//TablesSources", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").item(tb).getAttributes.getNamedItem("name").getNodeValue
+        var tablename = xpath.evaluate("//TablesSources", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").item(tb).getAttributes.getNamedItem("nom").getNodeValue
         var source_table_1 = spark.read.jdbc(jdbcUrl, tablename, connectionProperties)
         source_table_1.createTempView(tablename)
         tb = tb + 1;
@@ -134,15 +134,15 @@ class TestScalaClass {
       //lire les classes clients et enregistrer les fonctions à utiliser dans le contexte
 
 
-      var numbersofclasses = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").getLength
+      var numbersofclasses = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").getLength
 
 
       nc = 0;
       var classname = ""
       while (nc < numbersofclasses) {
-        classname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("NameClass").getNodeValue
-        var functionname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("NameFunction").getNodeValue
-        var inputclass = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
+        classname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomclasse").getNodeValue
+        var functionname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomfonction").getNodeValue
+        var inputclass = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
 
         context.registerFunction(functionname, Class.forName(classname).getDeclaredMethod(functionname, Class.forName(inputclass)))
 
@@ -160,20 +160,20 @@ class TestScalaClass {
         var vgformula = vg.getAs[String]("_value")
         var vgexpression = parsers.parseExpression(vgformula)
         var vgvalue = vgexpression.getValue(context).asInstanceOf[Double]
-        context.setVariable(vg.getAs[String]("_name"), vgvalue)
+        context.setVariable(vg.getAs[String]("_nom"), vgvalue)
       })
 
 
-      val aggregListlength = document.getElementsByTagName("aggregation").getLength
+      val aggregListlength = document.getElementsByTagName("Transformation").getLength
       // get how many aggregation in aggregations
       var k = 0
       while (k < aggregListlength) {
 
-        var elementaggrega = xpath.evaluate("//aggregation[@id='" + k + "']", document, XPathConstants.NODE).asInstanceOf[Element]
-        var idrow = elementaggrega.getAttribute("idrow")
+        var elementaggrega = xpath.evaluate("//Transformation[@id='" + k + "']", document, XPathConstants.NODE).asInstanceOf[Element]
+        var idrow = elementaggrega.getAttribute("idLigne")
         tablesources = elementaggrega.getAttribute("tablesource")
-        selectedcolumns = elementaggrega.getAttribute("colonnessources")
-        var targettable = elementaggrega.getAttribute("targettable")
+        selectedcolumns = elementaggrega.getAttribute("structuresource")
+        var targettable = elementaggrega.getAttribute("tablecible")
 
 
 
@@ -195,7 +195,7 @@ class TestScalaClass {
             context.setVariable(key.toString, bean.get(key.toString))
           })
 
-          var targetcolonneslength = elementaggrega.getElementsByTagName("RichKeyMapping").getLength
+          var targetcolonneslength = elementaggrega.getElementsByTagName("CartographieCle").getLength
 
           var idexp = parsers.parseExpression(idrow)
           var id = idexp.getValue(context).asInstanceOf[String]
@@ -205,9 +205,9 @@ class TestScalaClass {
           breakable{
 
             while (g < targetcolonneslength) {
-              var valueexp = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("mappingformula").getNodeValue
-              var colfamily = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(0)
-              var colname = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(1)
+              var valueexp = elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("cartographieformule").getNodeValue
+              var colfamily = elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
+              var colname = elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
 
 
 
@@ -216,11 +216,11 @@ class TestScalaClass {
               var valueCondition=true
 
 
-              if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("type") == null) {
+              if (elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("type") == null) {
 
 
-                if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("condition") != null) {
-                  var condition = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("condition").getNodeValue
+                if (elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("condition") != null) {
+                  var condition = elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("condition").getNodeValue
                   var expp = parsers.parseExpression(condition)
                   valueCondition = expp.getValue(context).asInstanceOf[Boolean]
                 }
@@ -228,17 +228,17 @@ class TestScalaClass {
                 if (valueCondition) {
 
 
-                  if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("formatters") != null) {
-                    var formatters = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("formatters").getNodeValue
+                  if (elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("formatters") != null) {
+                    var formatters = elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("formatters").getNodeValue
                     var parseformat = parsers.parseExpression(formatters)
                     parseformat.getValue(context).asInstanceOf[java.lang.String]
                   }
 
 
 
-                  if (elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("pattern") != null) {
+                  if (elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("pattern") != null) {
 
-                    pattern = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("pattern").getNodeValue
+                    pattern = elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("pattern").getNodeValue
                     var parsepattern = parsers.parseExpression(pattern).getValue(context).asInstanceOf[Boolean]
                     if (!parsepattern ) {
                       patternboolean = false
@@ -267,13 +267,13 @@ class TestScalaClass {
               }
 
               else {
-                var typemap = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("type").getNodeValue
+                var typemap = elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("type").getNodeValue
 
                 if (typemap == "Document") {
-                  var tablesourcename = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("tablesource").getNodeValue
+                  var tablesourcename = elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("tablesource").getNodeValue
 
 
-                  var keyjoin = elementaggrega.getElementsByTagName("RichKeyMapping").item(g).getAttributes.getNamedItem("keyJoin").getNodeValue
+                  var keyjoin = elementaggrega.getElementsByTagName("CartographieCle").item(g).getAttributes.getNamedItem("CleJointure").getNodeValue
                   var exppkey = parsers.parseExpression(keyjoin)
 
                   var keyvalue = exppkey.getValue(context).asInstanceOf[String]

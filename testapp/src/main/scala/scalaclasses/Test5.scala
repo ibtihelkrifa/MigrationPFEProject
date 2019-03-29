@@ -18,7 +18,7 @@ import org.w3c.dom.{Element, Node, NodeList}
 import scala.util.control.Breaks.breakable
 
 class Test5 {
-  def functioon2(): String =
+  def Configurer(path:String): String =
   {
 
     val debut = System.currentTimeMillis
@@ -33,12 +33,12 @@ class Test5 {
     var df = spark.read
       .option("rowTag", "debut")
       .format("com.databricks.spark.xml")
-      .load("/home/ibtihel/Desktop/PFE/testapp/testconfig.xml")
+      .load(path)
 
 
     df.createOrReplaceTempView("xmltable");
 
-    val source = spark.sql("""select xmltable.source.ip, xmltable.source.port,xmltable.source.name,xmltable.source.user,xmltable.source.password from xmltable """);
+    val source = spark.sql("""select xmltable.source.ip, xmltable.source.port,xmltable.source.nom,xmltable.source.user,xmltable.source.password from xmltable """);
     val ip = source.collectAsList().get(0).get(0).toString
     val port = source.collectAsList().get(0).get(1).toString
     val nameBd = source.collectAsList().get(0).get(2).toString
@@ -48,8 +48,14 @@ class Test5 {
     val connectionProperties = new Properties()
     connectionProperties.put("user", s"${user}")
     connectionProperties.put("password", s"${password}")
+
+
+
     DriverManager.getConnection(jdbcUrl, connectionProperties)
     // connection à HBase
+
+
+
     val HbaseConf = HBaseConfiguration.create()
     HbaseConf.set("hbase.master", "localhost")
     HbaseConf.set("hbase.zookeeper.quorum", "localhost")
@@ -61,7 +67,7 @@ class Test5 {
 
     val docBuilderFactory = DocumentBuilderFactory.newInstance
     val docBuilder = docBuilderFactory.newDocumentBuilder
-    val document = docBuilder.parse(new File("/home/ibtihel/Desktop/PFE/testapp/testconfig.xml"))
+    val document = docBuilder.parse(new File(path))
 
     val xpathFactory = XPathFactory.newInstance
     val xpath = xpathFactory.newXPath
@@ -81,7 +87,7 @@ class Test5 {
 
     s = 0
     while (s < stciblelength) {
-      var stciblename = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("name").getNodeValue
+      var stciblename = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("nom").getNodeValue
       var cfnames = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("CF").getNodeValue
       val tableDescriptor = new HTableDescriptor(TableName.valueOf(stciblename))
       val nbcf = cfnames.split(";").length
@@ -108,7 +114,7 @@ class Test5 {
     var tb=0
     while(tb<nbtablessources)
     {
-      var tablename = xpath.evaluate("//TablesSources", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").item(tb).getAttributes.getNamedItem("name").getNodeValue
+      var tablename = xpath.evaluate("//TablesSources", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").item(tb).getAttributes.getNamedItem("nom").getNodeValue
       var source_table_1 = spark.read.jdbc(jdbcUrl, tablename, connectionProperties)
       source_table_1.createTempView(tablename)
       tb = tb + 1;
@@ -120,15 +126,15 @@ class Test5 {
     //lire les classes clients et enregistrer les fonctions à utiliser dans le contexte
 
 
-    var numbersofclasses = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").getLength
+    var numbersofclasses = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").getLength
 
 
     nc = 0;
     var classname = ""
     while (nc < numbersofclasses) {
-      classname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("NameClass").getNodeValue
-      var functionname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("NameFunction").getNodeValue
-      var inputclass = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
+      classname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomclasse").getNodeValue
+      var functionname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomfonction").getNodeValue
+      var inputclass = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
 
       context.registerFunction(functionname, Class.forName(classname).getDeclaredMethod(functionname, Class.forName(inputclass)))
 
@@ -139,14 +145,14 @@ class Test5 {
     var VariablesGlobales = spark.read.option("rootTag", "VariablesGlobales")
       .option("rowTag", "vg")
       .format("com.databricks.spark.xml")
-      .load("/home/ibtihel/Desktop/PFE/testapp/testconfig.xml")
+      .load(path)
 
 
     VariablesGlobales.collectAsList().forEach(vg => {
       var vgformula = vg.getAs[String]("_value")
       var vgexpression = parsers.parseExpression(vgformula)
       var vgvalue = vgexpression.getValue(context).asInstanceOf[Double]
-      context.setVariable(vg.getAs[String]("_name"), vgvalue)
+      context.setVariable(vg.getAs[String]("_nom"), vgvalue)
     })
 
 
@@ -157,19 +163,19 @@ class Test5 {
 
 
 
-    var listparent=  xpath.evaluate("//aggregation[@type='racine']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
+    var listparent=  xpath.evaluate("//Transformation[@type='racine']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
 
-    implicit def pimpNodeList(nl: NodeList): Seq[Node] = (0 until nl.getLength map (nl item _))
+    implicit def pimpNodeList(nl: NodeList): Seq[Node] = 0 until nl.getLength map (nl item _)
 
 
 
     pimpNodeList(listparent).map(node =>{
 
       var id= node.getAttributes.getNamedItem("id").getNodeValue
-      var idrow=node.getAttributes.getNamedItem("idrow").getNodeValue
+      var idrow=node.getAttributes.getNamedItem("idLigne").getNodeValue
       var tablesource=node.getAttributes.getNamedItem("tablesource").getNodeValue
-      var colonnessources=node.getAttributes.getNamedItem("colonnessources").getNodeValue
-      var targettable=node.getAttributes.getNamedItem("targettable").getNodeValue
+      var colonnessources=node.getAttributes.getNamedItem("structuresource").getNodeValue
+      var targettable=node.getAttributes.getNamedItem("tablecible").getNodeValue
       var keyjoin=""
 
 
@@ -196,7 +202,7 @@ class Test5 {
 
       var hTable=connection.getTable(TableName.valueOf(targettable))
 
-      var RichKeyList=xpath.compile("//aggregation[@id='"+incrementaggrega+"']/RichKeyMapping[@father='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
+      var RichKeyList=xpath.compile("//Transformation[@id='"+incrementaggrega+"']/CartographieCle[@pere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
 
       var g=0;
 
@@ -216,8 +222,8 @@ class Test5 {
         })
 
         var idexp = parsers.parseExpression(idrow)
-        var id = idexp.getValue(context).asInstanceOf[String]
-        var put = new Put(Bytes.toBytes("row" + id))
+        var id = idexp.getValue(context).asInstanceOf[Long]
+        var put = new Put(Bytes.toBytes("row" + id.toString))
 
         breakable{
 
@@ -225,10 +231,10 @@ class Test5 {
 
             var richnode = RichKeyList.item(g)
 
-            var valueexp = richnode.getAttributes.getNamedItem("mappingformula").getNodeValue
-            var colfamily = richnode.getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(0)
+            var valueexp = richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
+            var colfamily = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
 
-            var colname = richnode.getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(1)
+            var colname = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
 
 
             if (richnode.getAttributes.getNamedItem("type") == null) {
@@ -253,21 +259,21 @@ class Test5 {
             g = g + 1
 
           }
-          var subaggregation = xpath.evaluate("//aggregation[@father='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
+          var subaggregation = xpath.evaluate("//Transformation[@pere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
 
           var subinc=0
 
           while(subinc < subaggregation.getLength)
           {
 
-            var subaggregation=xpath.evaluate("//aggregation[@father='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
+            var subaggregation=xpath.evaluate("//Transformation[@pere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
             var id= subaggregation.getAttributes.getNamedItem("id").getNodeValue
-            var idrow=subaggregation.getAttributes.getNamedItem("idrow").getNodeValue
+            var idrow=subaggregation.getAttributes.getNamedItem("idLigne").getNodeValue
             var tablesource=subaggregation.getAttributes.getNamedItem("tablesource").getNodeValue
-            var colonnessources=subaggregation.getAttributes.getNamedItem("colonnessources").getNodeValue
-            var targettable=subaggregation.getAttributes.getNamedItem("targettable").getNodeValue
+            var colonnessources=subaggregation.getAttributes.getNamedItem("structuresource").getNodeValue
+            var targettable=subaggregation.getAttributes.getNamedItem("tablecible").getNodeValue
 
-            var keyjoin=subaggregation.getAttributes.getNamedItem("keyjoin").getNodeValue
+            var keyjoin=subaggregation.getAttributes.getNamedItem("CleJointure").getNodeValue
             var keyparse=parsers.parseExpression(keyjoin)
             var keyjoinvalue = keyparse.getValue(context).asInstanceOf[String]
 

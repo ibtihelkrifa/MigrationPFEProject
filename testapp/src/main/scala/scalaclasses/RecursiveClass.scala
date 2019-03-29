@@ -50,7 +50,7 @@ class RecursiveClass {
 
       df.createOrReplaceTempView("xmltable");
 
-      val source = spark.sql("""select xmltable.source.ip, xmltable.source.port,xmltable.source.name,xmltable.source.user,xmltable.source.password from xmltable """);
+      val source = spark.sql("""select xmltable.source.ip, xmltable.source.port,xmltable.source.nom,xmltable.source.user,xmltable.source.password from xmltable """);
       val ip = source.collectAsList().get(0).get(0).toString
       val port = source.collectAsList().get(0).get(1).toString
       val nameBd = source.collectAsList().get(0).get(2).toString
@@ -100,7 +100,7 @@ class RecursiveClass {
 
       s = 0
       while (s < stciblelength) {
-        var stciblename = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("name").getNodeValue
+        var stciblename = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("nom").getNodeValue
         var cfnames = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("CF").getNodeValue
         val tableDescriptor = new HTableDescriptor(TableName.valueOf(stciblename))
         val nbcf = cfnames.split(";").length
@@ -127,7 +127,7 @@ class RecursiveClass {
       var tb=0
       while(tb<nbtablessources)
       {
-        var tablename = xpath.evaluate("//TablesSources", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").item(tb).getAttributes.getNamedItem("name").getNodeValue
+        var tablename = xpath.evaluate("//TablesSources", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").item(tb).getAttributes.getNamedItem("nom").getNodeValue
         var source_table_1 = spark.read.jdbc(jdbcUrl, tablename, connectionProperties)
         source_table_1.createTempView(tablename)
         tb = tb + 1;
@@ -139,15 +139,15 @@ class RecursiveClass {
       //lire les classes clients et enregistrer les fonctions à utiliser dans le contexte
 
 
-      var numbersofclasses = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").getLength
+      var numbersofclasses = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").getLength
 
 
       nc = 0;
       var classname = ""
       while (nc < numbersofclasses) {
-        classname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("NameClass").getNodeValue
-        var functionname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("NameFunction").getNodeValue
-        var inputclass = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
+        classname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomclasse").getNodeValue
+        var functionname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomfonction").getNodeValue
+        var inputclass = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
 
         context.registerFunction(functionname, Class.forName(classname).getDeclaredMethod(functionname, Class.forName(inputclass)))
 
@@ -165,27 +165,27 @@ class RecursiveClass {
         var vgformula = vg.getAs[String]("_value")
         var vgexpression = parsers.parseExpression(vgformula)
         var vgvalue = vgexpression.getValue(context).asInstanceOf[Double]
-        context.setVariable(vg.getAs[String]("_name"), vgvalue)
+        context.setVariable(vg.getAs[String]("_nom"), vgvalue)
       })
 
 
 
 
 
-      var numberOfAggrigations = xpath.evaluate("//aggregation", document, XPathConstants.NODESET).asInstanceOf[NodeList].getLength
+      var numberOfAggrigations = xpath.evaluate("//Transformation", document, XPathConstants.NODESET).asInstanceOf[NodeList].getLength
 
       var agg=0
       var LengthOfRichKey=0
       while(agg < numberOfAggrigations) {
 
-        var RichKeyList=xpath.compile("//aggregation[@id='"+agg+"']/RichKeyMapping[@id='" + agg + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
+        var RichKeyList=xpath.compile("//Transformation[@id='"+agg+"']/CartographieCle[@id='" + agg + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
 
-        var currentaggregation= xpath.compile("//aggregation[@id='"+agg+"']").evaluate(document,XPathConstants.NODE).asInstanceOf[Node]
+        var currentaggregation= xpath.compile("//Transformation[@id='"+agg+"']").evaluate(document,XPathConstants.NODE).asInstanceOf[Node]
         var tablesources=currentaggregation.getAttributes.getNamedItem("tablesource").getNodeValue
-        var idrow = currentaggregation.getAttributes.getNamedItem("idrow").getNodeValue
+        var idrow = currentaggregation.getAttributes.getNamedItem("idLigne").getNodeValue
 
-         selectedcolumns = currentaggregation.getAttributes.getNamedItem("colonnessources").getNodeValue
-        var targettable = currentaggregation.getAttributes.getNamedItem("targettable").getNodeValue
+         selectedcolumns = currentaggregation.getAttributes.getNamedItem("structuresource").getNodeValue
+        var targettable = currentaggregation.getAttributes.getNamedItem("tablecible").getNodeValue
 
 
 
@@ -219,12 +219,12 @@ class RecursiveClass {
             while (g < RichKeyList.getLength) {
 
 
-              var richnode=xpath.compile("//aggregation[@id='"+agg+"']/RichKeyMapping[@id='" + agg + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList].item(g)
+              var richnode=xpath.compile("//Transforamtion[@id='"+agg+"']/CartographieCle[@id='" + agg + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList].item(g)
 
-               valueexp = richnode.getAttributes.getNamedItem("mappingformula").getNodeValue
-              var colfamily=richnode.getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(0)
+               valueexp = richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
+              var colfamily=richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
 
-              var colname=richnode.getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(1)
+              var colname=richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
 
               if (richnode.getAttributes.getNamedItem("type") == null) {
 
@@ -239,7 +239,7 @@ class RecursiveClass {
               else if(richnode.getAttributes.getNamedItem("type") == "Document")
                 {
 
-                  var keyjoin = currentaggregation.getAttributes.getNamedItem("KeyJoin").getNodeValue
+                  var keyjoin = currentaggregation.getAttributes.getNamedItem("CleJointure").getNodeValue
                   var exppkey = parsers.parseExpression(keyjoin)
 
                   var keyvalue = exppkey.getValue(context).asInstanceOf[String]
@@ -273,7 +273,7 @@ class RecursiveClass {
 
 
 
- ///////   var nodelist=xpath.compile("//aggregation[@id='"+1+"']/RichKeyMapping[@id='" + 1 + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
+ ///////   var nodelist=xpath.compile("//aggregation[@id='"+1+"']/CartographieCle[@id='" + 1 + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
 
 
 

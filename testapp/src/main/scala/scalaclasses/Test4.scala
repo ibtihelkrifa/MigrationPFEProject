@@ -40,7 +40,7 @@ class Test4 {
 
     df.createOrReplaceTempView("xmltable");
 
-    val source = spark.sql("""select xmltable.source.ip, xmltable.source.port,xmltable.source.name,xmltable.source.user,xmltable.source.password from xmltable """);
+    val source = spark.sql("""select xmltable.source.ip, xmltable.source.port,xmltable.source.nom,xmltable.source.user,xmltable.source.password from xmltable """);
     val ip = source.collectAsList().get(0).get(0).toString
     val port = source.collectAsList().get(0).get(1).toString
     val nameBd = source.collectAsList().get(0).get(2).toString
@@ -83,7 +83,7 @@ class Test4 {
 
     s = 0
     while (s < stciblelength) {
-      var stciblename = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("name").getNodeValue
+      var stciblename = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("nom").getNodeValue
       var cfnames = HbaseTables.getElementsByTagName("StructureCible").item(s).getAttributes.getNamedItem("CF").getNodeValue
       val tableDescriptor = new HTableDescriptor(TableName.valueOf(stciblename))
       val nbcf = cfnames.split(";").length
@@ -110,7 +110,7 @@ class Test4 {
     var tb=0
     while(tb<nbtablessources)
     {
-      var tablename = xpath.evaluate("//TablesSources", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").item(tb).getAttributes.getNamedItem("name").getNodeValue
+      var tablename = xpath.evaluate("//TablesSources", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").item(tb).getAttributes.getNamedItem("nom").getNodeValue
       var source_table_1 = spark.read.jdbc(jdbcUrl, tablename, connectionProperties)
       source_table_1.createTempView(tablename)
       tb = tb + 1;
@@ -122,15 +122,15 @@ class Test4 {
     //lire les classes clients et enregistrer les fonctions à utiliser dans le contexte
 
 
-    var numbersofclasses = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").getLength
+    var numbersofclasses = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").getLength
 
 
     nc = 0;
     var classname = ""
     while (nc < numbersofclasses) {
-      classname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("NameClass").getNodeValue
-      var functionname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("NameFunction").getNodeValue
-      var inputclass = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
+      classname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomclasse").getNodeValue
+      var functionname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomfonction").getNodeValue
+      var inputclass = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
 
       context.registerFunction(functionname, Class.forName(classname).getDeclaredMethod(functionname, Class.forName(inputclass)))
 
@@ -148,7 +148,7 @@ class Test4 {
       var vgformula = vg.getAs[String]("_value")
       var vgexpression = parsers.parseExpression(vgformula)
       var vgvalue = vgexpression.getValue(context).asInstanceOf[Double]
-      context.setVariable(vg.getAs[String]("_name"), vgvalue)
+      context.setVariable(vg.getAs[String]("_nom"), vgvalue)
     })
 
 
@@ -160,10 +160,10 @@ class Test4 {
 
 
     var elementaggrega = xpath.evaluate("//aggregation[@id='" + 0 + "']", document, XPathConstants.NODE).asInstanceOf[Element]
-    var targettable=elementaggrega.getAttribute("targettable")
-    var idrow=elementaggrega.getAttribute("idrow")
+    var targettable=elementaggrega.getAttribute("tablecible")
+    var idrow=elementaggrega.getAttribute("idLigne")
     var tablesource=elementaggrega.getAttribute("tablesource")
-    var colonnessources=elementaggrega.getAttribute("colonnessources")
+    var colonnessources=elementaggrega.getAttribute("structuresource")
     var numberOfAggrigations = xpath.evaluate("//aggregation[@type='racine']", document, XPathConstants.NODESET).asInstanceOf[NodeList].getLength
     var incrementaggrega=0
     var keyjoin=""
@@ -190,7 +190,7 @@ class Test4 {
 
       var hTable=connection.getTable(TableName.valueOf(targettable))
 
-      var RichKeyList=xpath.compile("//aggregation[@id='"+incrementaggrega+"']/RichKeyMapping[@father='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
+      var RichKeyList=xpath.compile("//aggregation[@id='"+incrementaggrega+"']/CartographieCle[@pere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
 
       var g=0;
 
@@ -221,10 +221,10 @@ class Test4 {
 
             var richnode = RichKeyList.item(g)
 
-            var valueexp = richnode.getAttributes.getNamedItem("mappingformula").getNodeValue
-            var colfamily = richnode.getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(0)
+            var valueexp = richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
+            var colfamily = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
 
-            var colname = richnode.getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(1)
+            var colname = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
 
 
             if (richnode.getAttributes.getNamedItem("type") == null) {
@@ -249,19 +249,19 @@ class Test4 {
             g = g + 1
 
           }
-          var subaggregation = xpath.evaluate("//aggregation[@father='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
+          var subaggregation = xpath.evaluate("//aggregation[@pere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
 
           var subinc=0
 
           while(subinc < subaggregation.getLength)
           {
 
-            var subaggregation=xpath.evaluate("//aggregation[@father='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
+            var subaggregation=xpath.evaluate("//aggregation[@pere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
             var id= subaggregation.getAttributes.getNamedItem("id").getNodeValue
-            var idrow=subaggregation.getAttributes.getNamedItem("idrow").getNodeValue
+            var idrow=subaggregation.getAttributes.getNamedItem("idLigne").getNodeValue
             var tablesource=subaggregation.getAttributes.getNamedItem("tablesource").getNodeValue
-            var colonnessources=subaggregation.getAttributes.getNamedItem("colonnessources").getNodeValue
-            var targettable=subaggregation.getAttributes.getNamedItem("targettable").getNodeValue
+            var colonnessources=subaggregation.getAttributes.getNamedItem("structuresource").getNodeValue
+            var targettable=subaggregation.getAttributes.getNamedItem("tablecible").getNodeValue
 
             var keyjoin=subaggregation.getAttributes.getNamedItem("keyjoin").getNodeValue
             var keyparse=parsers.parseExpression(keyjoin)
@@ -285,10 +285,10 @@ class Test4 {
         var j= incrementaggrega+1
         var element = xpath.evaluate("//aggregation[@type='racine']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(j)
         var id= element.getAttributes.getNamedItem("id").getNodeValue
-        var idrow=element.getAttributes.getNamedItem("idrow").getNodeValue
+        var idrow=element.getAttributes.getNamedItem("idLigne").getNodeValue
         var tablesource=element.getAttributes.getNamedItem("tablesource").getNodeValue
-        var colonnessources=element.getAttributes.getNamedItem("colonnessources").getNodeValue
-        var targettable=element.getAttributes.getNamedItem("targettable").getNodeValue
+        var colonnessources=element.getAttributes.getNamedItem("structuresource").getNodeValue
+        var targettable=element.getAttributes.getNamedItem("tablecible").getNodeValue
         var keyjoin=""
 
         aggregation(id.toInt,idrow,tablesource,colonnessources,targettable,numberparentaggregations, keyjoin)
@@ -330,7 +330,7 @@ def functioon2(): String =
 
     df.createOrReplaceTempView("xmltable");
 
-    val source = spark.sql("""select xmltable.source.ip, xmltable.source.port,xmltable.source.name,xmltable.source.user,xmltable.source.password from xmltable """);
+    val source = spark.sql("""select xmltable.source.ip, xmltable.source.port,xmltable.source.nom,xmltable.source.user,xmltable.source.password from xmltable """);
     val ip = source.collectAsList().get(0).get(0).toString
     val port = source.collectAsList().get(0).get(1).toString
     val nameBd = source.collectAsList().get(0).get(2).toString
@@ -412,15 +412,15 @@ def functioon2(): String =
     //lire les classes clients et enregistrer les fonctions à utiliser dans le contexte
 
 
-    var numbersofclasses = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").getLength
+    var numbersofclasses = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").getLength
 
 
     nc = 0;
     var classname = ""
     while (nc < numbersofclasses) {
-      classname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("NameClass").getNodeValue
-      var functionname = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("NameFunction").getNodeValue
-      var inputclass = xpath.evaluate("//ClientClass", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Function").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
+      classname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomclasse").getNodeValue
+      var functionname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomfonction").getNodeValue
+      var inputclass = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
 
       context.registerFunction(functionname, Class.forName(classname).getDeclaredMethod(functionname, Class.forName(inputclass)))
 
@@ -458,10 +458,10 @@ def functioon2(): String =
     pimpNodeList(listparent).map(node =>{
 
       var id= node.getAttributes.getNamedItem("id").getNodeValue
-      var idrow=node.getAttributes.getNamedItem("idrow").getNodeValue
+      var idrow=node.getAttributes.getNamedItem("idLigne").getNodeValue
       var tablesource=node.getAttributes.getNamedItem("tablesource").getNodeValue
-      var colonnessources=node.getAttributes.getNamedItem("colonnessources").getNodeValue
-      var targettable=node.getAttributes.getNamedItem("targettable").getNodeValue
+      var colonnessources=node.getAttributes.getNamedItem("structuresource").getNodeValue
+      var targettable=node.getAttributes.getNamedItem("tablecible").getNodeValue
       var keyjoin=""
 
 
@@ -488,7 +488,7 @@ def functioon2(): String =
 
       var hTable=connection.getTable(TableName.valueOf(targettable))
 
-      var RichKeyList=xpath.compile("//aggregation[@id='"+incrementaggrega+"']/RichKeyMapping[@father='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
+      var RichKeyList=xpath.compile("//Transforamtion[@id='"+incrementaggrega+"']/CartographieCle[@pere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
 
       var g=0;
 
@@ -517,10 +517,10 @@ def functioon2(): String =
 
             var richnode = RichKeyList.item(g)
 
-            var valueexp = richnode.getAttributes.getNamedItem("mappingformula").getNodeValue
-            var colfamily = richnode.getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(0)
+            var valueexp = richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
+            var colfamily = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
 
-            var colname = richnode.getAttributes.getNamedItem("columnqualifier").getNodeValue.split(":").apply(1)
+            var colname = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
 
 
             if (richnode.getAttributes.getNamedItem("type") == null) {
@@ -545,21 +545,21 @@ def functioon2(): String =
             g = g + 1
 
           }
-          var subaggregation = xpath.evaluate("//aggregation[@father='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
+          var subaggregation = xpath.evaluate("//Transformation[@pere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
 
           var subinc=0
 
           while(subinc < subaggregation.getLength)
           {
 
-            var subaggregation=xpath.evaluate("//aggregation[@father='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
+            var subaggregation=xpath.evaluate("//Transformation[@pere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
             var id= subaggregation.getAttributes.getNamedItem("id").getNodeValue
-            var idrow=subaggregation.getAttributes.getNamedItem("idrow").getNodeValue
+            var idrow=subaggregation.getAttributes.getNamedItem("idLigne").getNodeValue
             var tablesource=subaggregation.getAttributes.getNamedItem("tablesource").getNodeValue
-            var colonnessources=subaggregation.getAttributes.getNamedItem("colonnessources").getNodeValue
-            var targettable=subaggregation.getAttributes.getNamedItem("targettable").getNodeValue
+            var colonnessources=subaggregation.getAttributes.getNamedItem("structuresource").getNodeValue
+            var targettable=subaggregation.getAttributes.getNamedItem("tablecible").getNodeValue
 
-            var keyjoin=subaggregation.getAttributes.getNamedItem("keyjoin").getNodeValue
+            var keyjoin=subaggregation.getAttributes.getNamedItem("CleJointure").getNodeValue
             var keyparse=parsers.parseExpression(keyjoin)
             var keyjoinvalue = keyparse.getValue(context).asInstanceOf[String]
 
