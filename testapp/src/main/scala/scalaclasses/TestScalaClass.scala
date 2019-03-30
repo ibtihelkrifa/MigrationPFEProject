@@ -198,8 +198,8 @@ class TestScalaClass {
           var targetcolonneslength = elementaggrega.getElementsByTagName("CartographieCle").getLength
 
           var idexp = parsers.parseExpression(idrow)
-          var id = idexp.getValue(context).asInstanceOf[String]
-          var put = new Put(Bytes.toBytes("row" + id))
+          var id = idexp.getValue(context).asInstanceOf[Long]
+          var put = new Put(Bytes.toBytes("row" + id.toString))
 
           var g = 0
           breakable{

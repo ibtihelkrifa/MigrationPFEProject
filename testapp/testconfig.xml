@@ -1,27 +1,30 @@
-<debut>
-
-    <source type="mysql">
-        <ip>127.0.0.1</ip>
-        <port>3306</port>
-        <nom>TestPFE</nom>
-        <user>root</user>
-        <password>root</password>
-    </source>
-
-    <cible type="hbase">
-        <ip>127.0.0.1</ip>
-        <port>2181</port>
-    </cible>
+<Configuration rollbackfile="rollbackconf.xml" >
 
 
+
+  <DonnéesDeConnection>
+    <source type="mysql" ip="127.0.0.1" port="3306" nomBase="TestPFE" utilisateur="root" motdepasse="root" />
+
+    <cible type="hbase" hbase.master="localhost" hbase.zookeeper.quorum="localhost" hbase.zookeeper.property.clientPort="2181" />
+  </DonnéesDeConnection>
+
+
+<Structures>
     <StructuresCibles>
-        <StructureCible id="0" nom="EMPLOYEES" CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE"/>
-
-        <StructureCible id="1" nom="STUDENTS" CF="FAMILY_STUDENT;NOTE_STUDENT"/>
-
-        <StructureCible id="3" nom="DEPARTEMENT" CF="DEPARTEMENT_DETAILS" />
-
+        <Table id="0" nom="EMPLOYEES" CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE"/>
+        <Table id="1" nom="STUDENTS" CF="FAMILY_STUDENT;NOTE_STUDENT"/>
+        <Table id="3" nom="DEPARTEMENT" CF="DEPARTEMENT_DETAILS" />
     </StructuresCibles>
+
+    <StructureSource>
+        <Table nom="etudiant"/>
+        <Table nom="user" />
+        <Table nom="address"/>
+        <Table nom="departement"/>
+        <Table nom="addressdetails" />
+    </StructureSource>
+</Structures>
+
 
     <FonctionClient>
         <Fonction nomclasse="com.vermeg.testapp.services.TestService" nomfonction="getAge" InputClass="java.lang.String" />
@@ -36,52 +39,37 @@
     </VariablesGlobales>
 
 
-    <TablesSources>
-        <Table nom="etudiant"/>
-        <Table nom="user" />
-        <Table nom="address"/>
-        <Table nom="departement"/>
-        <Table nom="addressdetails" />
-    </TablesSources>
-
-
-
     <Transformations>
-
-
 
         <Transformation type="racine" id="0" idLigne="#numEtudiant" structuresource="etudiant.numEtudiant,etudiant.nom,etudiant.prenom,etudiant.email,etudiant.birthDate"
                         structurecible="FAMILY_STUDENT:Nom,FAMILY_STUDENT:email,FAMILY_STUDENT:age" tablesource="etudiant" tablecible="STUDENTS"  >
-            <CartographieCle pere="0" colonnesource="nom,prenom" colonnecible="FAMILY_STUDENT:Nom" cartographieformule="#nom+' '+#prenom"/>
-            <CartographieCle pere="0" colonnesource="email" colonnecible="FAMILY_STUDENT:email" strictpattern="true" pattern="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' " cartographieformule="#email"/>
-            <CartographieCle pere="0" colonnesource="birthDate" colonnecible="FAMILY_STUDENT:age" cartographieformule="#getAge(#birthDate)"/>
+            <CartographieCle idpere="0" colonnesource="nom,prenom" colonnecible="FAMILY_STUDENT:Nom" cartographieformule="#nom+' '+#prenom"/>
+            <CartographieCle idpere="0" colonnesource="email" colonnecible="FAMILY_STUDENT:email" strictpattern="true" pattern="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' " cartographieformule="#email"/>
+            <CartographieCle idpere="0" colonnesource="birthDate" colonnecible="FAMILY_STUDENT:age" cartographieformule="#getAge(#birthDate)"/>
         </Transformation>
-
-
-
 
 
 
         <Transformation type="racine" id="1" idLigne="#USERId" structuresource="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
                         structurecible="FAMILY_EMPLOYEE:Salaire,FAMILY_EMPLOYEE:Taille,FAMILY_EMPLOYEE:Age,FAMILY_EMPLOYEE:BirthDate,FAMILY_EMPLOYEE:FullName,FAMILY_EMPLOYEE:Iduser" tablesource="user" tablecible="EMPLOYEES"  >
-            <CartographieCle pere="1" colonnesource="salaire" cartographieformule="T(java.lang.String).valueOf(#salaire *#tauxr)" condition="#salaire gt 300 ? true : false" colonnecible="FAMILY_EMPLOYEE:Salaire"/>
+            <CartographieCle idpere="1" colonnesource="salaire" cartographieformule="T(java.lang.String).valueOf(#salaire *#tauxr)" condition="#salaire gt 300 ? true : false" colonnecible="FAMILY_EMPLOYEE:Salaire"/>
 
-            <CartographieCle pere="1" colonnesource="taille" formatters="#taille=#formatNumber(#taille)" cartographieformule="T(java.lang.String).valueOf(#taille)" condition="#taille gt 2 ? true : false" colonnecible="FAMILY_EMPLOYEE:Taille"/>
-            <CartographieCle pere="1" colonnesource="birthDate" cartographieformule="#getAge(#birthDate)" colonnecible="FAMILY_EMPLOYEE:Age"/>
-            <CartographieCle pere="1" colonnesource="birthDate" formatters="#birthDate=#FormatDate(#birthDate)" cartographieformule="#birthDate" pattern="#birthDate matches '^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$'"
+            <CartographieCle idpere="1" colonnesource="taille" formatters="#taille=#formatNumber(#taille)" cartographieformule="T(java.lang.String).valueOf(#taille)" condition="#taille gt 2 ? true : false" colonnecible="FAMILY_EMPLOYEE:Taille"/>
+            <CartographieCle idpere="1" colonnesource="birthDate" cartographieformule="#getAge(#birthDate)" colonnecible="FAMILY_EMPLOYEE:Age"/>
+            <CartographieCle idpere="1" colonnesource="birthDate" formatters="#birthDate=#FormatDate(#birthDate)" cartographieformule="#birthDate" pattern="#birthDate matches '^(0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])[- /.](19|20)\d\d$'"
                              colonnecible="FAMILY_EMPLOYEE:BirthDate"/>
-            <CartographieCle pere="1" colonnesource="FirstName,LastName" cartographieformule="#firstName+' '+#lastName" colonnecible="FAMILY_EMPLOYEE:FullName"/>
-            <CartographieCle pere="1" cartographieformule="T(java.lang.String).valueOf(#USERId)" colonnecible="FAMILY_EMPLOYEE:Iduser"/>
+            <CartographieCle idpere="1" colonnesource="FirstName,LastName" cartographieformule="#firstName+' '+#lastName" colonnecible="FAMILY_EMPLOYEE:FullName"/>
+            <CartographieCle idpere="1" cartographieformule="T(java.lang.String).valueOf(#USERId)" colonnecible="FAMILY_EMPLOYEE:Iduser"/>
 
 
-            <Transformation id="2" pere="1" idLigne="#USERId" structuresource="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
+            <Transformation type="jointure" id="2" idpere="1" idLigne="#USERId" structuresource="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
                             structurecible="ADDRESS_EMPLOYEE:address" tableintermediaire="null" keyjoinint="null" CleJointure="'userByUserId = ' + T(java.lang.String).valueOf(#USERId)" tablesource="address" tablecible="EMPLOYEES">
 
-                <CartographieCle pere="2" colonnesource="*" type="Document" cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:address"/>
+                <CartographieCle idpere="2" colonnesource="*" type="Document" cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:address"/>
 
-                <Transformation id="3" pere="2" idLigne="#USERId" structuresource="id_detail, nom_detail, address_id"
+                <Transformation type="jointure" id="3" idpere="2" idLigne="#USERId" structuresource="id_detail, nom_detail, address_id"
                                 structurecible="ADDRESS_EMPLOYEE:details" CleJointure="'address_id =' + T(java.lang.String).valueOf(#addressId)" tablesource="addressdetails" tablecible="EMPLOYEES">
-                    <CartographieCle pere="3" colonnesource="*" type="Document" cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:details"/>
+                    <CartographieCle idpere="3" colonnesource="*" type="Document" cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:details"/>
 
                 </Transformation>
 
@@ -91,19 +79,13 @@
 
 
 
-
-
         <Transformation type="racine" id="4" idLigne="#idDept" structuresource="idDept,nomDept"
                         structurecible="DEPARTEMENT_DETAILS:iddepartement,DEPARTEMENT_DETAILS:nomdepartemebt" tablesource="departement" tablecible="DEPARTEMENT"  >
-
-            <CartographieCle pere="4" colonnesource="idDept" cartographieformule="T(java.lang.String).valueOf(#idDept)" colonnecible="DEPARTEMENT_DETAILS:iddepartement"/>
-            <CartographieCle pere="4" colonnesource="nomDept" cartographieformule="#nomDept" colonnecible="DEPARTEMENT_DETAILS:nomdepartement"/>
+            <CartographieCle idpere="4" colonnesource="idDept" cartographieformule="T(java.lang.String).valueOf(#idDept)" colonnecible="DEPARTEMENT_DETAILS:iddepartement"/>
+            <CartographieCle idpere="4" colonnesource="nomDept" cartographieformule="#nomDept" colonnecible="DEPARTEMENT_DETAILS:nomdepartement"/>
 
         </Transformation>
 
-
-
-
     </Transformations>
 
-</debut>
+</Configuration>

@@ -25,7 +25,7 @@ public class TestController {
         //return "hello";
     }
 
-
+//fonctionnel
     @GetMapping("test3/")
     public String Configurer( )
     {
@@ -39,5 +39,15 @@ public class TestController {
          return new Test4().function();
         //return "hello";
     }
+
+    @GetMapping("test6/")
+    public String rollbackfunction()
+    {
+        return new Rollback().rollbackfunction("/home/ibtihel/Desktop/PFE/testapp/rollbackconf.xml");
+    }
+
+
+
+
 
 }

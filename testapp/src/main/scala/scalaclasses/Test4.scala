@@ -190,7 +190,7 @@ class Test4 {
 
       var hTable=connection.getTable(TableName.valueOf(targettable))
 
-      var RichKeyList=xpath.compile("//aggregation[@id='"+incrementaggrega+"']/CartographieCle[@pere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
+      var RichKeyList=xpath.compile("//aggregation[@id='"+incrementaggrega+"']/CartographieCle[@idpere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
 
       var g=0;
 
@@ -212,8 +212,8 @@ class Test4 {
 
 
         var idexp = parsers.parseExpression(idrow)
-        var id = idexp.getValue(context).asInstanceOf[String]
-        var put = new Put(Bytes.toBytes("row" + id))
+        var id = idexp.getValue(context).asInstanceOf[Long]
+        var put = new Put(Bytes.toBytes("row" + id.toString))
 
         breakable{
 
@@ -249,14 +249,14 @@ class Test4 {
             g = g + 1
 
           }
-          var subaggregation = xpath.evaluate("//aggregation[@pere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
+          var subaggregation = xpath.evaluate("//aggregation[@idpere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
 
           var subinc=0
 
           while(subinc < subaggregation.getLength)
           {
 
-            var subaggregation=xpath.evaluate("//aggregation[@pere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
+            var subaggregation=xpath.evaluate("//aggregation[@idpere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
             var id= subaggregation.getAttributes.getNamedItem("id").getNodeValue
             var idrow=subaggregation.getAttributes.getNamedItem("idLigne").getNodeValue
             var tablesource=subaggregation.getAttributes.getNamedItem("tablesource").getNodeValue
@@ -488,7 +488,7 @@ def functioon2(): String =
 
       var hTable=connection.getTable(TableName.valueOf(targettable))
 
-      var RichKeyList=xpath.compile("//Transforamtion[@id='"+incrementaggrega+"']/CartographieCle[@pere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
+      var RichKeyList=xpath.compile("//Transforamtion[@id='"+incrementaggrega+"']/CartographieCle[@idpere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
 
       var g=0;
 
@@ -545,14 +545,14 @@ def functioon2(): String =
             g = g + 1
 
           }
-          var subaggregation = xpath.evaluate("//Transformation[@pere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
+          var subaggregation = xpath.evaluate("//Transformation[@idpere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
 
           var subinc=0
 
           while(subinc < subaggregation.getLength)
           {
 
-            var subaggregation=xpath.evaluate("//Transformation[@pere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
+            var subaggregation=xpath.evaluate("//Transformation[@idpere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
             var id= subaggregation.getAttributes.getNamedItem("id").getNodeValue
             var idrow=subaggregation.getAttributes.getNamedItem("idLigne").getNodeValue
             var tablesource=subaggregation.getAttributes.getNamedItem("tablesource").getNodeValue
