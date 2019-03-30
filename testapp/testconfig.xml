@@ -62,20 +62,21 @@
             <CartographieCle idpere="1" cartographieformule="T(java.lang.String).valueOf(#USERId)" colonnecible="FAMILY_EMPLOYEE:Iduser"/>
 
 
-            <Transformation type="jointure" id="2" idpere="1" idLigne="#USERId" structuresource="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
+            <SousTransformation type="jointure" id="2" idpere="1" idLigne="#USERId" structuresource="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
                             structurecible="ADDRESS_EMPLOYEE:address" tableintermediaire="null" keyjoinint="null" CleJointure="'userByUserId = ' + T(java.lang.String).valueOf(#USERId)" tablesource="address" tablecible="EMPLOYEES">
 
-                <CartographieCle idpere="2" colonnesource="*" type="Document" cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:address"/>
+                <Document idpere="2" colonnesource="*"  cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:address"/>
 
-                <Transformation type="jointure" id="3" idpere="2" idLigne="#USERId" structuresource="id_detail, nom_detail, address_id"
+                <SousTransformation type="jointure" id="3" idpere="2" idLigne="#USERId" structuresource="id_detail, nom_detail, address_id"
                                 structurecible="ADDRESS_EMPLOYEE:details" CleJointure="'address_id =' + T(java.lang.String).valueOf(#addressId)" tablesource="addressdetails" tablecible="EMPLOYEES">
-                    <CartographieCle idpere="3" colonnesource="*" type="Document" cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:details"/>
+                    <Document idpere="3" colonnesource="*" type="Document" cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:details"/>
 
-                </Transformation>
+                </SousTransformation>
 
-            </Transformation>
+            </SousTransformation>
 
         </Transformation>
+
 
 
 

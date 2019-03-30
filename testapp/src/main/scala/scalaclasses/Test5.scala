@@ -8,19 +8,117 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import javax.xml.parsers.DocumentBuilderFactory
-import javax.xml.xpath.{XPathConstants, XPathFactory}
+import javax.xml.xpath.{XPath, XPathConstants, XPathFactory}
 import org.apache.hadoop.hbase.{HBaseConfiguration, HColumnDescriptor, HTableDescriptor, TableName}
 import org.apache.hadoop.hbase.client.{ConnectionFactory, Delete, Put}
 import org.apache.hadoop.hbase.util.Bytes
-import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.json.simple.parser.JSONParser
+import org.springframework.cglib.beans.BeanMap
 import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.support.StandardEvaluationContext
-import org.w3c.dom.{Element, Node, NodeList}
+import org.w3c.dom.{Document, Element, Node, NodeList}
 
 import scala.util.control.Breaks.breakable
 
 class Test5 {
+
+
+
+
+
+  def setattributerow(colfamily: String, colname: String, targettable: String, rowdom: Element, rollbackdoc: Document) = {
+    var colfamilyattribute=rollbackdoc.createAttribute("Famillecolonne")
+    colfamilyattribute.setValue(colfamily)
+
+    rowdom.setAttributeNode(colfamilyattribute)
+    var colnameattribute=rollbackdoc.createAttribute("nomcolonne")
+    colnameattribute.setValue(colname)
+    rowdom.setAttributeNode(colnameattribute)
+
+    var talecibleattribute=rollbackdoc.createAttribute("table")
+    talecibleattribute.setValue(targettable)
+    rowdom.setAttributeNode(talecibleattribute)
+  }
+
+
+  def savebeanrowincontext(context:StandardEvaluationContext,row:String): BeanMap =
+  {
+    var parser = new JSONParser
+
+    var json = parser.parse(row).asInstanceOf[org.json.simple.JSONObject]
+
+    var bean = new BeanGenerators(json).setBeanSchema()
+    bean = new BeanGenerators(json).getBean(bean)
+    var keys2 = json.keySet()
+
+    keys2.forEach(key => {
+      context.setVariable(key.toString, bean.get(key.toString))
+    })
+    return bean
+  }
+
+  def createrollbackfile(rollbackdoc: Document,xpath: XPath, document: Document, document1: Document) = {
+
+      val transformerFactory = TransformerFactory.newInstance
+      val transformer = transformerFactory.newTransformer
+      val sources = new DOMSource(rollbackdoc)
+      var Configuration=  xpath.evaluate("//Configuration", document, XPathConstants.NODE).asInstanceOf[Element]
+      val resultat = new StreamResult(new File(Configuration.getAttribute("rollbackfile")))
+      transformer.transform(sources, resultat)
+  }
+
+  def setGlobalVariablesIntoContext(VariablesGlobales: DataFrame, parsers: SpelExpressionParser, context: StandardEvaluationContext)
+  = {
+    VariablesGlobales.collectAsList().forEach(vg => {
+      var vgformula = vg.getAs[String]("_value")
+      var vgexpression = parsers.parseExpression(vgformula)
+      var vgvalue = vgexpression.getValue(context).asInstanceOf[Double]
+      context.setVariable(vg.getAs[String]("_nom"), vgvalue)
+    })
+  }
+
+
+  def setClientFunctionsIntoContext(xpath: XPath, context: StandardEvaluationContext, document: Document) = {
+    var numbersofclasses = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").getLength
+
+
+    var nc = 0;
+    var classname = ""
+    while (nc < numbersofclasses) {
+      classname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomclasse").getNodeValue
+      var functionname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomfonction").getNodeValue
+      var inputclass = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
+
+      context.registerFunction(functionname, Class.forName(classname).getDeclaredMethod(functionname, Class.forName(inputclass)))
+
+      nc = nc + 1;
+    }
+  }
+
+
+  def createrowdom(id: Long,racine: Element, rollbackdoc: Document, toString: String, targettable: String):Element = {
+
+
+      var rowdom=rollbackdoc.createElement("row")
+      racine.appendChild(rowdom)
+
+      var idattribute=rollbackdoc.createAttribute("idrow")
+      idattribute.setValue(id.toString)
+      rowdom.setAttributeNode(idattribute)
+
+      var talecibleattribute=rollbackdoc.createAttribute("table")
+      talecibleattribute.setValue(targettable)
+      rowdom.setAttributeNode(talecibleattribute)
+      return rowdom
+
+  }
+
+
+
+
+
+
   def Configurer(path:String): String =
   {
 
@@ -35,7 +133,6 @@ class Test5 {
 
     val xpathFactory = XPathFactory.newInstance
     val xpath = xpathFactory.newXPath
-
     val docBuilderFactory = DocumentBuilderFactory.newInstance
     val docBuilder = docBuilderFactory.newDocumentBuilder
     val document = docBuilder.parse(new File(path))
@@ -83,9 +180,9 @@ class Test5 {
     var nc = 0
     var test=0
     var keyjoinvalu=""
-    var parser = new JSONParser
     val context = new StandardEvaluationContext
     val parsers = new SpelExpressionParser
+
 
     var HbaseTables = xpath.evaluate("//StructuresCibles", document, XPathConstants.NODE).asInstanceOf[Element] // get  tables in hbase to work on
 
@@ -131,21 +228,7 @@ class Test5 {
 
     //lire les classes clients et enregistrer les fonctions à utiliser dans le contexte
 
-
-    var numbersofclasses = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").getLength
-
-
-    nc = 0;
-    var classname = ""
-    while (nc < numbersofclasses) {
-      classname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomclasse").getNodeValue
-      var functionname = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("nomfonction").getNodeValue
-      var inputclass = xpath.evaluate("//FonctionClient", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Fonction").item(nc).getAttributes.getNamedItem("InputClass").getNodeValue
-
-      context.registerFunction(functionname, Class.forName(classname).getDeclaredMethod(functionname, Class.forName(inputclass)))
-
-      nc = nc + 1;
-    }
+    setClientFunctionsIntoContext(xpath,context,document)
 
     // enregistre dans le contexte les variable globales et leurs valeurs
     var VariablesGlobales = spark.read.option("rootTag", "VariablesGlobales")
@@ -153,20 +236,7 @@ class Test5 {
       .format("com.databricks.spark.xml")
       .load(path)
 
-
-    VariablesGlobales.collectAsList().forEach(vg => {
-      var vgformula = vg.getAs[String]("_value")
-      var vgexpression = parsers.parseExpression(vgformula)
-      var vgvalue = vgexpression.getValue(context).asInstanceOf[Double]
-      context.setVariable(vg.getAs[String]("_nom"), vgvalue)
-    })
-
-
-
-
-
-
-
+    setGlobalVariablesIntoContext(VariablesGlobales,parsers,context)
 
 
     var listparent=  xpath.evaluate("//Transformation[@type='racine']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
@@ -192,166 +262,138 @@ class Test5 {
       var tablename=rollbackdoc.createAttribute("nom")
       tablename.setValue(targettable)
       TableHbasedom.setAttributeNode(tablename)
-
-      aggregation(id.toInt,idrow,tablesource,colonnessources,targettable, keyjoin)
+      aggregation("transformation",id.toInt,idrow,tablesource,colonnessources,targettable, keyjoin)
 
     })
 
+    createrollbackfile(rollbackdoc,xpath,document,rollbackdoc: Document)
 
 
-
-    def aggregation(incrementaggrega: Int,idrow : String, tablesource: String,colonnessources: String,targettable: String, keyjoin: String): Unit =
+    def aggregation(typetransformation:String,incrementaggrega: Int,idrow : String, tablesource: String,colonnessources: String,targettable: String, keyjoin: String): Unit =
     {
-
-
-      var dfaggrega = spark.sql("select " + colonnessources + " from " + tablesource )
-
-      if(keyjoin.length> " ".length)
-      {
-        dfaggrega=spark.sql("select " + colonnessources + " from " + tablesource + " where " + keyjoin)
-      }
-
       val conn = ConnectionFactory.createConnection(HbaseConf)
       val hAdmin = conn.getAdmin
 
       var hTable=connection.getTable(TableName.valueOf(targettable))
 
-      var RichKeyList=xpath.compile("//Transformation[@id='"+incrementaggrega+"']/CartographieCle[@idpere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
 
-      var g=0;
+      if(typetransformation=="transformation")
+        {
+          var dfaggrega = spark.sql("select " + colonnessources + " from " + tablesource )
+          var RichKeyList=xpath.compile("//Transformation[@id='"+incrementaggrega+"']/CartographieCle[@idpere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
+          var g=0;
+          dfaggrega.toJSON.collectAsList().forEach(row => {
 
-      var r=0
-      dfaggrega.toJSON.collectAsList().forEach(row => {
+            var g=0
 
-        var g=0
+            var bean=savebeanrowincontext(context,row)
 
-        var json = parser.parse(row).asInstanceOf[org.json.simple.JSONObject]
+            var idexp = parsers.parseExpression(idrow)
+            var id = idexp.getValue(context).asInstanceOf[Long]
+            var put = new Put(Bytes.toBytes("row" + id.toString))
 
-        var bean = new BeanGenerators(json).setBeanSchema()
-        bean = new BeanGenerators(json).getBean(bean)
-        var keys2 = json.keySet()
+            breakable{
+              while(g < RichKeyList.getLength) {
 
-        keys2.forEach(key => {
-          context.setVariable(key.toString, bean.get(key.toString))
-        })
+                var richnode = RichKeyList.item(g)
 
-        var idexp = parsers.parseExpression(idrow)
-        var id = idexp.getValue(context).asInstanceOf[Long]
-        var put = new Put(Bytes.toBytes("row" + id.toString))
+                var valueexp = richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
+                var colfamily = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
 
+                var colname = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
 
-
-
-        breakable{
-
-          while(g < RichKeyList.getLength) {
-
-            var richnode = RichKeyList.item(g)
-
-            var valueexp = richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
-            var colfamily = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
-
-            var colname = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
-
-            var rowdom=rollbackdoc.createElement("row")
-            racine.appendChild(rowdom)
-
-            var idattribute=rollbackdoc.createAttribute("idrow")
-            idattribute.setValue(id.toString)
-            rowdom.setAttributeNode(idattribute)
-
-            var talecibleattribute=rollbackdoc.createAttribute("table")
-            talecibleattribute.setValue(targettable)
-            rowdom.setAttributeNode(talecibleattribute)
+                var rowdom= createrowdom(id,racine,rollbackdoc,id.toString,targettable)
 
 
+                  var valueparse = parsers.parseExpression(valueexp)
+                  var finalvalue = valueparse.getValue(context).asInstanceOf[String]
+                  put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes(finalvalue))
+                  hTable.put(put)
 
-            if (richnode.getAttributes.getNamedItem("type") == null) {
+                  setattributerow(colfamily,colname,targettable,rowdom,rollbackdoc)
+                g = g + 1
 
-              var valueparse = parsers.parseExpression(valueexp)
-              var finalvalue = valueparse.getValue(context).asInstanceOf[String]
-              put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes(finalvalue))
-
-              var colfamilyattribute=rollbackdoc.createAttribute("Famillecolonne")
-              colfamilyattribute.setValue(colfamily)
-
-              rowdom.setAttributeNode(colfamilyattribute)
-              var colnameattribute=rollbackdoc.createAttribute("nomcolonne")
-              colnameattribute.setValue(colname)
-              rowdom.setAttributeNode(colnameattribute)
-
-              var talecibleattribute=rollbackdoc.createAttribute("table")
-              talecibleattribute.setValue(targettable)
-              rowdom.setAttributeNode(talecibleattribute)
-
-              hTable.put(put)
-            }
-
-            else if(richnode.getAttributes.getNamedItem("type").getNodeValue == "Document" )
-            {
-
-              put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname + " " + r), Bytes.toBytes(bean.toString))
-
-
-              var colfamilyattribute=rollbackdoc.createAttribute("Famillecolonne")
-              colfamilyattribute.setValue(colfamily)
-
-              rowdom.setAttributeNode(colfamilyattribute)
-              var colnameattribute=rollbackdoc.createAttribute("nomcolonne")
-              colnameattribute.setValue(colname + " " + r)
-              rowdom.setAttributeNode(colnameattribute)
-
-              hTable.put(put)
-              r=r+1
-            }
-
-
-            g = g + 1
-
-          }
-
-          var subaggregation = xpath.evaluate("//Transformation[@idpere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
-
-          var subinc=0
-
-          while(subinc < subaggregation.getLength)
-          {
-
-            var subaggregation=xpath.evaluate("//Transformation[@idpere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
-            var id= subaggregation.getAttributes.getNamedItem("id").getNodeValue
-            var idrow=subaggregation.getAttributes.getNamedItem("idLigne").getNodeValue
-            var tablesource=subaggregation.getAttributes.getNamedItem("tablesource").getNodeValue
-            var colonnessources=subaggregation.getAttributes.getNamedItem("structuresource").getNodeValue
-            var targettable=subaggregation.getAttributes.getNamedItem("tablecible").getNodeValue
-
-            var keyjoin=subaggregation.getAttributes.getNamedItem("CleJointure").getNodeValue
-            var keyparse=parsers.parseExpression(keyjoin)
-            var keyjoinvalue = keyparse.getValue(context).asInstanceOf[String]
-
-            subinc=subinc+1
-            aggregation(id.toInt,idrow,tablesource,colonnessources,targettable,keyjoinvalue)
-            keyjoin=""
-
-          }
-
+              }}
+            soustransformationfunction(context,xpath,parsers,incrementaggrega)
+          })
         }
 
 
-      })
+
+            else if(typetransformation=="soustransformation")
+              {
+                var dfaggrega=spark.sql("select " + colonnessources + " from " + tablesource + " where " + keyjoin)
+                var DocumenList=xpath.compile("//SousTransformation[@id='"+incrementaggrega+"']/Document[@idpere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
+
+                var r=0
+
+                dfaggrega.toJSON.collectAsList().forEach(row => {
+                  var bean=savebeanrowincontext(context,row)
+                  var idexp = parsers.parseExpression(idrow)
+                  var id = idexp.getValue(context).asInstanceOf[Long]
+                  var put = new Put(Bytes.toBytes("row" + id.toString))
+                  var d=0
+                  breakable{
+
+                while(d< DocumenList.getLength )
+                {
+
+                  var richnode = DocumenList.item(d)
+
+                  var valueexp = richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
+                  var colfamily = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
+                  var colname = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
+                  var rowdom= createrowdom(id,racine,rollbackdoc,id.toString,targettable)
+                  put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname + " " + r), Bytes.toBytes(bean.toString))
+                  setattributerow(colfamily,colname,targettable,rowdom,rollbackdoc)
+                  hTable.put(put)
+                  r=r+1
+                  d=d+1
+                }
+
+                    soustransformationfunction(context,xpath,parsers,incrementaggrega)
+
+                  }})
+
+              }
+
+      }
+
+
+    def soustransformationfunction(context: StandardEvaluationContext, xpath: XPath, parsers: SpelExpressionParser, incrementaggrega: Int): Unit = {
+
+
+      var subaggregation = xpath.evaluate("//SousTransformation[@idpere='"+incrementaggrega+"']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
+
+      var subinc=0
+
+      while(subinc < subaggregation.getLength) {
+
+        var subaggregation = xpath.evaluate("//SousTransformation[@idpere='" + incrementaggrega + "']", document, XPathConstants.NODESET).asInstanceOf[NodeList].item(subinc)
+        var id = subaggregation.getAttributes.getNamedItem("id").getNodeValue
+        var idrow = subaggregation.getAttributes.getNamedItem("idLigne").getNodeValue
+        var tablesource = subaggregation.getAttributes.getNamedItem("tablesource").getNodeValue
+        var colonnessources = subaggregation.getAttributes.getNamedItem("structuresource").getNodeValue
+        var targettable = subaggregation.getAttributes.getNamedItem("tablecible").getNodeValue
+
+        var keyjoin = subaggregation.getAttributes.getNamedItem("CleJointure").getNodeValue
+        var keyparse = parsers.parseExpression(keyjoin)
+        var keyjoinvalue = keyparse.getValue(context).asInstanceOf[String]
+
+        subinc = subinc + 1
+        aggregation("soustransformation", id.toInt, idrow, tablesource, colonnessources, targettable, keyjoinvalue)
+        keyjoin = ""
+      }
 
 
     }
 
 
-    val transformerFactory = TransformerFactory.newInstance
-    val transformer = transformerFactory.newTransformer
-    val sources = new DOMSource(rollbackdoc)
-    var COnfiguration=  xpath.evaluate("//Configuration", document, XPathConstants.NODE).asInstanceOf[Element]
-
-    val resultat = new StreamResult(new File(COnfiguration.getAttribute("rollbackfile")))
-
-    transformer.transform(sources, resultat)
-
     return (System.currentTimeMillis()-debut).toString
   }
+
+
+
+
+
 }
