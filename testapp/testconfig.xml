@@ -52,6 +52,9 @@
 
 
 
+
+
+
         <Transformation  id="1" idLigne="#USERId" structuresource="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
                         structurecible="FAMILY_EMPLOYEE:Salaire,FAMILY_EMPLOYEE:Taille,FAMILY_EMPLOYEE:Age,FAMILY_EMPLOYEE:BirthDate,FAMILY_EMPLOYEE:FullName,FAMILY_EMPLOYEE:Iduser" tablesource="user" tablecible="EMPLOYEES"  >
             <CartographieCle idpere="1" colonnesource="salaire" cartographieformule="T(java.lang.String).valueOf(#salaire *#tauxr)" condition="#salaire gt 300 ? true : false" colonnecible="FAMILY_EMPLOYEE:Salaire"/>
@@ -85,6 +88,9 @@
             <CartographieCle idpere="4" colonnesource="nomDept" cartographieformule="#nomDept" colonnecible="DEPARTEMENT_DETAILS:nomdepartement"/>
 
         </Transformation>
+
+
+
 
         <Transformation id="5" idLigne="#userId" structuresource="*" structurecible="" tablesource="user" tablecible="FACULTY">
             <CartographieCle idpere="5" colonnesource="userId" cartographieformule="T(java.lang.String).valueOf(#userId)" colonnecible="ASSIGNMENT_FAMILY:IDUSER" />

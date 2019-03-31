@@ -1,8 +1,6 @@
 package com.vermeg.testapp.controllers;
 
 
-import org.apache.spark.sql.Dataset;
-import org.apache.spark.sql.Row;
 import org.springframework.web.bind.annotation.*;
 import scalaclasses.*;
 
@@ -29,7 +27,7 @@ public class TestController {
     @GetMapping("test3/")
     public String Configurer( )
     {
-        return new Test5().Configurer("/home/ibtihel/Desktop/PFE/testapp/testconfig.xml");
+        return new ConfigureService().Configurer("/home/ibtihel/Desktop/PFE/testapp/testconfig.xml");
         //return "hello";
     }
 
