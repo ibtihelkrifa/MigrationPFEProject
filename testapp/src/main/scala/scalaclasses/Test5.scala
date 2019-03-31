@@ -239,7 +239,7 @@ class Test5 {
     setGlobalVariablesIntoContext(VariablesGlobales,parsers,context)
 
 
-    var listparent=  xpath.evaluate("//Transformation[@type='racine']", document, XPathConstants.NODESET).asInstanceOf[NodeList]
+    var listparent=  xpath.evaluate("//Transformation", document, XPathConstants.NODESET).asInstanceOf[NodeList]
 
     implicit def pimpNodeList(nl: NodeList): Seq[Node] = 0 until nl.getLength map (nl item _)
 
@@ -253,6 +253,7 @@ class Test5 {
       var idrow=node.getAttributes.getNamedItem("idLigne").getNodeValue
       var tablesource=node.getAttributes.getNamedItem("tablesource").getNodeValue
       var colonnessources=node.getAttributes.getNamedItem("structuresource").getNodeValue
+      var colonnescible=node.getAttributes.getNamedItem("structurecible").getNodeValue
       var targettable=node.getAttributes.getNamedItem("tablecible").getNodeValue
       var keyjoin=""
       var TableHbasedom=rollbackdoc.createElement("Table")
@@ -262,14 +263,14 @@ class Test5 {
       var tablename=rollbackdoc.createAttribute("nom")
       tablename.setValue(targettable)
       TableHbasedom.setAttributeNode(tablename)
-      aggregation("transformation",id.toInt,idrow,tablesource,colonnessources,targettable, keyjoin)
+      aggregation("transformation",id.toInt,idrow,tablesource,colonnessources,colonnescible,targettable, keyjoin)
 
     })
 
     createrollbackfile(rollbackdoc,xpath,document,rollbackdoc: Document)
 
 
-    def aggregation(typetransformation:String,incrementaggrega: Int,idrow : String, tablesource: String,colonnessources: String,targettable: String, keyjoin: String): Unit =
+    def aggregation(typetransformation:String,incrementaggrega: Int,idrow : String, tablesource: String,colonnessources: String,colonnecible:String,targettable: String, keyjoin: String): Unit =
     {
       val conn = ConnectionFactory.createConnection(HbaseConf)
       val hAdmin = conn.getAdmin
@@ -323,7 +324,6 @@ class Test5 {
             else if(typetransformation=="soustransformation")
               {
                 var dfaggrega=spark.sql("select " + colonnessources + " from " + tablesource + " where " + keyjoin)
-                var DocumenList=xpath.compile("//SousTransformation[@id='"+incrementaggrega+"']/Document[@idpere='" + incrementaggrega + "']").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
 
                 var r=0
 
@@ -332,28 +332,20 @@ class Test5 {
                   var idexp = parsers.parseExpression(idrow)
                   var id = idexp.getValue(context).asInstanceOf[Long]
                   var put = new Put(Bytes.toBytes("row" + id.toString))
-                  var d=0
-                  breakable{
+                  var colfamily = colonnecible.split(":").apply(0)
+                  var colname = colonnecible.split(":").apply(1)
 
-                while(d< DocumenList.getLength )
-                {
 
-                  var richnode = DocumenList.item(d)
-
-                  var valueexp = richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
-                  var colfamily = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
-                  var colname = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
                   var rowdom= createrowdom(id,racine,rollbackdoc,id.toString,targettable)
                   put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname + " " + r), Bytes.toBytes(bean.toString))
-                  setattributerow(colfamily,colname,targettable,rowdom,rollbackdoc)
+                  setattributerow(colfamily,colname + " " + r,targettable,rowdom,rollbackdoc)
                   hTable.put(put)
                   r=r+1
-                  d=d+1
-                }
+
 
                     soustransformationfunction(context,xpath,parsers,incrementaggrega)
 
-                  }})
+                  })
 
               }
 
@@ -375,13 +367,13 @@ class Test5 {
         var tablesource = subaggregation.getAttributes.getNamedItem("tablesource").getNodeValue
         var colonnessources = subaggregation.getAttributes.getNamedItem("structuresource").getNodeValue
         var targettable = subaggregation.getAttributes.getNamedItem("tablecible").getNodeValue
-
+        var colonnecible=subaggregation.getAttributes.getNamedItem("structurecible").getNodeValue
         var keyjoin = subaggregation.getAttributes.getNamedItem("CleJointure").getNodeValue
         var keyparse = parsers.parseExpression(keyjoin)
         var keyjoinvalue = keyparse.getValue(context).asInstanceOf[String]
 
         subinc = subinc + 1
-        aggregation("soustransformation", id.toInt, idrow, tablesource, colonnessources, targettable, keyjoinvalue)
+        aggregation("soustransformation", id.toInt, idrow, tablesource, colonnessources, colonnecible,targettable, keyjoinvalue)
         keyjoin = ""
       }
 

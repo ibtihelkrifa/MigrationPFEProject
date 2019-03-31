@@ -14,6 +14,7 @@
         <Table id="0" nom="EMPLOYEES" CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE"/>
         <Table id="1" nom="STUDENTS" CF="FAMILY_STUDENT;NOTE_STUDENT"/>
         <Table id="3" nom="DEPARTEMENT" CF="DEPARTEMENT_DETAILS" />
+        <Table id="4" nom="FACULTY" CF="ASSIGNMENT_FAMILY" />
     </StructuresCibles>
 
     <StructureSource>
@@ -22,6 +23,7 @@
         <Table nom="address"/>
         <Table nom="departement"/>
         <Table nom="addressdetails" />
+        <Table nom="user_dept" />
     </StructureSource>
 </Structures>
 
@@ -41,7 +43,7 @@
 
     <Transformations>
 
-        <Transformation type="racine" id="0" idLigne="#numEtudiant" structuresource="etudiant.numEtudiant,etudiant.nom,etudiant.prenom,etudiant.email,etudiant.birthDate"
+        <Transformation  id="0" idLigne="#numEtudiant" structuresource="etudiant.numEtudiant,etudiant.nom,etudiant.prenom,etudiant.email,etudiant.birthDate"
                         structurecible="FAMILY_STUDENT:Nom,FAMILY_STUDENT:email,FAMILY_STUDENT:age" tablesource="etudiant" tablecible="STUDENTS"  >
             <CartographieCle idpere="0" colonnesource="nom,prenom" colonnecible="FAMILY_STUDENT:Nom" cartographieformule="#nom+' '+#prenom"/>
             <CartographieCle idpere="0" colonnesource="email" colonnecible="FAMILY_STUDENT:email" strictpattern="true" pattern="#email matches '^[A-Z0-9._%+-]+@(?:[A-Z0-9-]+\.)+[A-Z]{2,}$' " cartographieformule="#email"/>
@@ -50,7 +52,7 @@
 
 
 
-        <Transformation type="racine" id="1" idLigne="#USERId" structuresource="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
+        <Transformation  id="1" idLigne="#USERId" structuresource="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
                         structurecible="FAMILY_EMPLOYEE:Salaire,FAMILY_EMPLOYEE:Taille,FAMILY_EMPLOYEE:Age,FAMILY_EMPLOYEE:BirthDate,FAMILY_EMPLOYEE:FullName,FAMILY_EMPLOYEE:Iduser" tablesource="user" tablecible="EMPLOYEES"  >
             <CartographieCle idpere="1" colonnesource="salaire" cartographieformule="T(java.lang.String).valueOf(#salaire *#tauxr)" condition="#salaire gt 300 ? true : false" colonnecible="FAMILY_EMPLOYEE:Salaire"/>
 
@@ -62,14 +64,11 @@
             <CartographieCle idpere="1" cartographieformule="T(java.lang.String).valueOf(#USERId)" colonnecible="FAMILY_EMPLOYEE:Iduser"/>
 
 
-            <SousTransformation type="jointure" id="2" idpere="1" idLigne="#USERId" structuresource="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
+            <SousTransformation  id="2" idpere="1" idLigne="#USERId" structuresource="address.addressId, address.pays,address.ville,address.rue,address.codePostal,address.userByUserId"
                             structurecible="ADDRESS_EMPLOYEE:address" tableintermediaire="null" keyjoinint="null" CleJointure="'userByUserId = ' + T(java.lang.String).valueOf(#USERId)" tablesource="address" tablecible="EMPLOYEES">
 
-                <Document idpere="2" colonnesource="*"  cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:address"/>
-
-                <SousTransformation type="jointure" id="3" idpere="2" idLigne="#USERId" structuresource="id_detail, nom_detail, address_id"
+                <SousTransformation  id="3" idpere="2" idLigne="#USERId" structuresource="id_detail, nom_detail, address_id"
                                 structurecible="ADDRESS_EMPLOYEE:details" CleJointure="'address_id =' + T(java.lang.String).valueOf(#addressId)" tablesource="addressdetails" tablecible="EMPLOYEES">
-                    <Document idpere="3" colonnesource="*" type="Document" cartographieformule="*" colonnecible="ADDRESS_EMPLOYEE:details"/>
 
                 </SousTransformation>
 
@@ -80,12 +79,21 @@
 
 
 
-        <Transformation type="racine" id="4" idLigne="#idDept" structuresource="idDept,nomDept"
+        <Transformation  id="4" idLigne="#idDept" structuresource="idDept,nomDept"
                         structurecible="DEPARTEMENT_DETAILS:iddepartement,DEPARTEMENT_DETAILS:nomdepartemebt" tablesource="departement" tablecible="DEPARTEMENT"  >
             <CartographieCle idpere="4" colonnesource="idDept" cartographieformule="T(java.lang.String).valueOf(#idDept)" colonnecible="DEPARTEMENT_DETAILS:iddepartement"/>
             <CartographieCle idpere="4" colonnesource="nomDept" cartographieformule="#nomDept" colonnecible="DEPARTEMENT_DETAILS:nomdepartement"/>
 
         </Transformation>
+
+        <Transformation id="5" idLigne="#userId" structuresource="*" structurecible="" tablesource="user" tablecible="FACULTY">
+            <CartographieCle idpere="5" colonnesource="userId" cartographieformule="T(java.lang.String).valueOf(#userId)" colonnecible="ASSIGNMENT_FAMILY:IDUSER" />
+            <CartographieCle idpere="5" colonnesource="firstname,lastname" cartographieformule="#firstName+' '+#lastName" colonnecible="ASSIGNMENT_FAMILY:FULLNAME" />
+            <SousTransformation id="6" idpere="5" tablesource="user_dept,departement" tablecible="FACULTY" structuresource="departement.idDept,departement.nomDept"
+            structurecible="ASSIGNMENT_FAMILY:assignment" idLigne="#userId" CleJointure="'user_dept.user_id=' + T(java.lang.String).valueOf(#userId) + '  and  ' + 'departement.idDept=user_dept.dept_id' ">
+            </SousTransformation>
+        </Transformation>
+
 
     </Transformations>
 
