@@ -4,6 +4,7 @@ import java.io.File
 import java.sql.DriverManager
 import java.util.Properties
 
+import com.vermeg.testapp.services.TestService
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
@@ -19,17 +20,21 @@ import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.support.StandardEvaluationContext
 import org.w3c.dom.{Document, Element, Node, NodeList}
 
-import scala.util.control.Breaks.breakable
+import scala.util.control.Breaks.{break, breakable}
 
 class ConfigureService {
 
+
+
+
   def Configurer(path:String): String =
   {
-
-    var userservice= new UserService
-
+    // enregistrer le temps de debut du programme
     val debut = System.currentTimeMillis
+//create an instance of user srevice that contains functions called in this class
+    var userservice= new UserService
     var spark= userservice.UserFunctionCreateSparkSession()
+    //lire le fichier de configuration
     val xpathFactory = XPathFactory.newInstance
     val xpath = xpathFactory.newXPath
 
@@ -38,22 +43,27 @@ class ConfigureService {
     val document = docBuilder.parse(new File(path))
 
 
-    //read du config file et recuperation des options de connection à la base de donnée
+
 
     // connection à HBase
     val connection= userservice.UserFunctiongetHBaseConnection(xpath,document)
+   // create rollback file
     val rollbackdoc= docBuilder.newDocument()
     val racine = rollbackdoc.createElement("Rollback")
     rollbackdoc.appendChild(racine)
+
     val context = new StandardEvaluationContext
     val parsers = new SpelExpressionParser
+    // creer le stbales hbases
     userservice.UserFunctionCreateHbaseTbalesIfNotExists(document,xpath,connection)
+    // crere  des temp view pour les table sources
     userservice.UserFunctionCreatTempViewOfSOurceTbales(document,xpath,spark)
-    //lire les tables sources  qu'on va utiliser
-    //lire les classes clients et enregistrer les fonctions à utiliser dans le contexte
+    // enregistre les fonctiosn client dans SPEL COntext
     userservice.UserFunctionsetClientFunctionsIntoContext(xpath,context,document)
-    // enregistre dans le contexte les variable globales et leurs valeurs
+    // enregistre dans le SPEL les variable globales et leurs valeurs
     userservice.UserFunctionsetGlobalVariablesIntoContext(xpath,document,spark,parsers,context)
+
+    // recuperer les transformation racines et commence le traitement
     var listparent=  xpath.evaluate("//Transformation", document, XPathConstants.NODESET).asInstanceOf[NodeList]
 
     implicit def pimpNodeList(nl: NodeList): Seq[Node] = 0 until nl.getLength map (nl item _)
@@ -85,6 +95,10 @@ class ConfigureService {
     userservice.createrollbackfile(rollbackdoc,xpath,document,rollbackdoc: Document)
 
 
+
+
+
+
     def aggregation(typetransformation:String,incrementaggrega: Int,idrow : String, tablesource: String,colonnessources: String,colonnecible:String,targettable: String, keyjoin: String): Unit =
     {
 
@@ -111,25 +125,53 @@ class ConfigureService {
               while(g < RichKeyList.getLength) {
 
                 var richnode = RichKeyList.item(g)
+                var condition=true
+                if(richnode.getAttributes.getNamedItem("condition") != null)
+                  {
+                    var conditonattribute=richnode.getAttributes.getNamedItem("condition").getNodeValue
+                    condition= parsers.parseExpression(conditonattribute).getValue(context).asInstanceOf[Boolean]
+                  }
 
-                var valueexp = richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
-                var colfamily = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
+                if(condition)
+                  {
 
-                var colname = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
+                    if(richnode.getAttributes.getNamedItem("converter")!= null)
+                      {
+                        userservice.convertValues(context,richnode,parsers)
+                      }
 
-                var rowdom= userservice.createrowdom(id,racine,rollbackdoc,id.toString,targettable)
+                     var valueexp = richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
+                     var colfamily = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(0)
+
+                     var colname = richnode.getAttributes.getNamedItem("colonnecible").getNodeValue.split(":").apply(1)
+
+                     var rowdom= userservice.createrowdom(id,racine,rollbackdoc,id.toString,targettable)
 
 
                   var valueparse = parsers.parseExpression(valueexp)
                   var finalvalue = valueparse.getValue(context).asInstanceOf[String]
                   put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname), Bytes.toBytes(finalvalue))
                   hTable.put(put)
+                 userservice.setattributerowRollback(colfamily,colname,targettable,rowdom,rollbackdoc)
 
-                userservice.setattributerow(colfamily,colname,targettable,rowdom,rollbackdoc)
+                  }
+
+                else
+                {
+
+                  val d = new Delete(Bytes.toBytes("row" + id))
+                  hTable.delete(d)
+                  break
+
+                }
+
                 g = g + 1
 
-              }}
-            soustransformationfunction(context,xpath,parsers,incrementaggrega)
+              }
+              soustransformationfunction(context,xpath,parsers,incrementaggrega)
+
+            }
+
           })
         }
 
@@ -148,11 +190,10 @@ class ConfigureService {
                   var put = new Put(Bytes.toBytes("row" + id.toString))
                   var colfamily = colonnecible.split(":").apply(0)
                   var colname = colonnecible.split(":").apply(1)
-
-
                   var rowdom= userservice.createrowdom(id,racine,rollbackdoc,id.toString,targettable)
+
                   put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname + " " + r), Bytes.toBytes(bean.toString))
-                  userservice.setattributerow(colfamily,colname + " " + r,targettable,rowdom,rollbackdoc)
+                  userservice.setattributerowRollback(colfamily,colname + " " + r,targettable,rowdom,rollbackdoc)
                   hTable.put(put)
                   r=r+1
 
@@ -182,6 +223,8 @@ class ConfigureService {
         var colonnessources = subaggregation.getAttributes.getNamedItem("structuresource").getNodeValue
         var targettable = subaggregation.getAttributes.getNamedItem("tablecible").getNodeValue
         var colonnecible=subaggregation.getAttributes.getNamedItem("structurecible").getNodeValue
+        var fieldfromparent=subaggregation.getAttributes.getNamedItem("FieldFromParent").getNodeValue
+
         var keyjoin = subaggregation.getAttributes.getNamedItem("CleJointure").getNodeValue
         var keyparse = parsers.parseExpression(keyjoin)
         var keyjoinvalue = keyparse.getValue(context).asInstanceOf[String]

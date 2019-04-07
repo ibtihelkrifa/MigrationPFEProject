@@ -11,6 +11,7 @@ package com.vermeg.testapp.services;
     import java.net.HttpURLConnection;
     import java.net.MalformedURLException;
     import java.net.URL;
+    import java.text.DecimalFormat;
     import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,15 +61,15 @@ public class TestService {
 
 
 
-    public  static String formatNumber(Double nb) {
+    public  static String formatNumber(Double nb, String pattern) {
 
         if(nb==null)
         {
             nb=Double.valueOf(0);
         }
-        NumberFormat numberFormatter = NumberFormat.getNumberInstance(Locale.FRENCH);
-         numberFormatter.setMaximumFractionDigits(2);
-        return numberFormatter.format(nb);
+        DecimalFormat myFormatter = new DecimalFormat(pattern);
+
+        return myFormatter.format(nb);
     }
 
 public static Double getcurrency(String url)
@@ -107,9 +108,9 @@ public static Double getcurrency(String url)
 }
 
 
-public static String FormatDate(String Date)
+public static String FormatDate(String Date, String pattern)
 {
-    SimpleDateFormat sm = new SimpleDateFormat("MM/dd/yyyy");
+    SimpleDateFormat sm = new SimpleDateFormat(pattern);
     SimpleDateFormat dp= new SimpleDateFormat("yyyy-MM-dd");
     Date dt = null;
     if(Date==null)

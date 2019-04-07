@@ -4,6 +4,7 @@ import java.io.File
 import java.sql.DriverManager
 import java.util.Properties
 
+import com.vermeg.testapp.services.TestService
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
@@ -16,11 +17,39 @@ import org.json.simple.parser.JSONParser
 import org.springframework.cglib.beans.BeanMap
 import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.support.StandardEvaluationContext
-import org.w3c.dom.{Document, Element, NodeList}
+import org.w3c.dom.{Document, Element, Node, NodeList}
 
 class UserService {
 
-  def setattributerow(colfamily: String, colname: String, targettable: String, rowdom: Element, rollbackdoc: Document) = {
+
+
+  def convertValues(context: StandardEvaluationContext, richnode: Node, parsers: SpelExpressionParser) = {
+    val converter= richnode.getAttributes.getNamedItem("converter").getNodeValue
+
+    if(converter == "convertDateTime")
+    {
+      val pattern= richnode.getAttributes.getNamedItem("pattern").getNodeValue
+      val valuenode=richnode.getAttributes.getNamedItem("valueToConvert").getNodeValue
+      var value= parsers.parseExpression(valuenode).getValue(context).asInstanceOf[String]
+      val formattedvalue = TestService.FormatDate(value,pattern)
+      var updatedvalue= valuenode.split("#").apply(1)
+      context.setVariable(updatedvalue,formattedvalue)
+    }
+    else if(converter == "NumberConverter")
+      {
+        val pattern= richnode.getAttributes.getNamedItem("pattern").getNodeValue
+        val valuenode=richnode.getAttributes.getNamedItem("valueToConvert").getNodeValue
+        var value= parsers.parseExpression(valuenode).getValue(context).asInstanceOf[java.lang.Double]
+        val formattedvalue = TestService.formatNumber(value,pattern)
+        var updatedvalue= valuenode.split("#").apply(1)
+        context.setVariable(updatedvalue,formattedvalue)
+
+      }
+
+  }
+
+
+  def setattributerowRollback(colfamily: String, colname: String, targettable: String, rowdom: Element, rollbackdoc: Document) = {
     var colfamilyattribute=rollbackdoc.createAttribute("Famillecolonne")
     colfamilyattribute.setValue(colfamily)
 
@@ -156,7 +185,6 @@ class UserService {
 
 
       val admin = connection.getAdmin
-
       if (!admin.tableExists(tableDescriptor.getTableName))
         admin.createTable(tableDescriptor)
 
