@@ -29,7 +29,7 @@ class UserService {
     if(converter == "convertDateTime")
     {
       val pattern= richnode.getAttributes.getNamedItem("pattern").getNodeValue
-      val valuenode=richnode.getAttributes.getNamedItem("valueToConvert").getNodeValue
+      val valuenode=richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
       var value= parsers.parseExpression(valuenode).getValue(context).asInstanceOf[String]
       val formattedvalue = TestService.FormatDate(value,pattern)
       var updatedvalue= valuenode.split("#").apply(1)
@@ -38,7 +38,7 @@ class UserService {
     else if(converter == "NumberConverter")
       {
         val pattern= richnode.getAttributes.getNamedItem("pattern").getNodeValue
-        val valuenode=richnode.getAttributes.getNamedItem("valueToConvert").getNodeValue
+        val valuenode=richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
         var value= parsers.parseExpression(valuenode).getValue(context).asInstanceOf[java.lang.Double]
         val formattedvalue = TestService.formatNumber(value,pattern)
         var updatedvalue= valuenode.split("#").apply(1)
@@ -47,6 +47,29 @@ class UserService {
       }
 
   }
+
+
+  def DateConverter(context: StandardEvaluationContext, richnode: Node, parsers: SpelExpressionParser): String={
+
+    val pattern= richnode.getAttributes.getNamedItem("pattern").getNodeValue
+    val valuenode=richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
+    var value= parsers.parseExpression(valuenode).getValue(context).asInstanceOf[String]
+    val formattedvalue = TestService.FormatDate(value,pattern)
+
+    return formattedvalue;
+  }
+
+  def NumberCOnverter(context: StandardEvaluationContext, richnode: Node, parsers: SpelExpressionParser): String={
+
+    val pattern= richnode.getAttributes.getNamedItem("pattern").getNodeValue
+    val valuenode=richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
+    var value= parsers.parseExpression(valuenode).getValue(context).asInstanceOf[java.lang.Double]
+    val formattedvalue = TestService.formatNumber(value,pattern)
+    return formattedvalue;
+  }
+
+
+
 
 
   def setattributerowRollback(colfamily: String, colname: String, targettable: String, rowdom: Element, rollbackdoc: Document) = {
@@ -131,7 +154,7 @@ class UserService {
   }
 
 
-  def createrowdom(id: Long,racine: Element, rollbackdoc: Document, toString: String, targettable: String):Element = {
+  def createrowdom(id: Long,racine: Element, rollbackdoc: Document, targettable: String):Element = {
 
 
     var rowdom=rollbackdoc.createElement("row")

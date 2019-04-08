@@ -24,14 +24,14 @@ public class TestService {
 
 
 
-    public static String getAge(String birthd)
+    public static Integer getAge(String birthd)
     {
         Calendar now = Calendar.getInstance();
         Date birthdate=null;
 
         if(birthd==null)
         {
-            return String.valueOf(0);
+            return 0;
         }
 
         try {
@@ -42,13 +42,13 @@ public class TestService {
             birthDay.setTimeInMillis(birthdate.getTime());
             //Get difference between years
             int years = now.get(Calendar.YEAR) - birthDay.get(Calendar.YEAR);
-            return String.valueOf(years);
+            return years;
            }
 
         catch (ParseException e) {
 
          System.out.println(e);
-         return String.valueOf(0);
+         return 0;
 
         }
 
