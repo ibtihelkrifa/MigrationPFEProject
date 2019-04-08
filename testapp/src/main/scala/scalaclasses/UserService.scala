@@ -154,14 +154,14 @@ class UserService {
   }
 
 
-  def createrowdom(id: Long,racine: Element, rollbackdoc: Document, targettable: String):Element = {
+  def createrowdom(id: String,racine: Element, rollbackdoc: Document, targettable: String):Element = {
 
 
     var rowdom=rollbackdoc.createElement("row")
     racine.appendChild(rowdom)
 
     var idattribute=rollbackdoc.createAttribute("idrow")
-    idattribute.setValue(id.toString)
+    idattribute.setValue(id)
     rowdom.setAttributeNode(idattribute)
 
     var talecibleattribute=rollbackdoc.createAttribute("table")

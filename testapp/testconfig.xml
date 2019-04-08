@@ -41,14 +41,17 @@
 
     <Transformations>
 
-        <Transformation  id="0" idLigne="#numEtudiant" structuresource="etudiant.numEtudiant,etudiant.nom,etudiant.prenom,etudiant.email,etudiant.birthDate"
+        <Transformation  id="0" typeidLigne="java.lang.Long" idLigne="#numEtudiant" structuresource="etudiant.numEtudiant,etudiant.nom,etudiant.prenom,etudiant.email,etudiant.birthDate"
                          structurecible="FAMILY_STUDENT:Nom,FAMILY_STUDENT:email,FAMILY_STUDENT:age" tablesource="etudiant" tablecible="STUDENTS"  >
             <CleRicheDeMappage idpere="0" colonnesource="nom,prenom" type="java.lang.String" colonnecible="FAMILY_STUDENT:Nom" cartographieformule="#nom+' '+#prenom"/>
             <CleRicheDeMappage idpere="0" colonnesource="email" type="java.lang.String" colonnecible="FAMILY_STUDENT:email" cartographieformule="#email"/>
             <CleRicheDeMappage idpere="0" colonnesource="birthDate" type="java.lang.Integer" colonnecible="FAMILY_STUDENT:age" cartographieformule="#getAge(#birthDate)"/>
         </Transformation>
 
-        <Transformation  id="1" idLigne="#USERId" structuresource="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
+
+
+
+        <Transformation  id="1" typeidLigne="java.lang.Long" idLigne="#USERId" structuresource="user.userId AS USERId,user.firstName,user.lastName,user.birthDate,user.taille,user.salaire"
                         structurecible="FAMILY_EMPLOYEE:Salaire,FAMILY_EMPLOYEE:Taille,FAMILY_EMPLOYEE:Age,FAMILY_EMPLOYEE:BirthDate,FAMILY_EMPLOYEE:FullName,FAMILY_EMPLOYEE:Iduser" tablesource="user" tablecible="EMPLOYEES"  >
 
             <CleRicheDeMappage  colonnesource="salaire" type="java.lang.String" converter="NumberConverter"   pattern="###,###.##" cartographieformule="#salaire *#tauxr" condition="#salaire gt 300 ? true : false" colonnecible="FAMILY_EMPLOYEE:Salaire"/>
@@ -71,7 +74,10 @@
 
 
 
-        <Transformation  id="2" idLigne="#idDept" structuresource="idDept,nomDept"
+
+
+
+        <Transformation  id="3" typeidLigne="java.lang.Long" idLigne="#idDept" structuresource="idDept,nomDept"
                          structurecible="DEPARTEMENT_DETAILS:iddepartement,DEPARTEMENT_DETAILS:nomdepartemebt" tablesource="departement" tablecible="DEPARTEMENT"  >
             <CleRicheDeMappage  colonnesource="idDept" type="java.lang.Long" cartographieformule="#idDept" colonnecible="DEPARTEMENT_DETAILS:iddepartement"/>
             <CleRicheDeMappage  colonnesource="nomDept" type="java.lang.String" cartographieformule="#nomDept" colonnecible="DEPARTEMENT_DETAILS:nomdepartement"/>
@@ -80,7 +86,7 @@
 
 
 
-        <Transformation id="5" idLigne="#userId" structuresource="*" structurecible="ASSIGNMENT_FAMILY:IDUSER,ASSIGNMENT_FAMILY:FULLNAME" tablesource="user" tablecible="FACULTY">
+        <Transformation id="4" typeidLigne="java.lang.Long" idLigne="#userId" structuresource="*" structurecible="ASSIGNMENT_FAMILY:IDUSER,ASSIGNMENT_FAMILY:FULLNAME" tablesource="user" tablecible="FACULTY">
             <CleRicheDeMappage  colonnesource="userId" type="java.lang.Long" cartographieformule="#userId" colonnecible="ASSIGNMENT_FAMILY:IDUSER" />
             <CleRicheDeMappage  colonnesource="firstname,lastname" type="java.lang.String" cartographieformule="#firstName+' '+#lastName" colonnecible="ASSIGNMENT_FAMILY:FULLNAME" />
             <Document  tablesource="user_dept,departement"  structuresource="departement.idDept,departement.nomDept"

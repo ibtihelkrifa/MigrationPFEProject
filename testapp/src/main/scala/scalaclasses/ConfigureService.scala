@@ -26,7 +26,6 @@ class ConfigureService {
 
 
 
-
   def Configurer(path:String): String =
   {
     // enregistrer le temps de debut du programme
@@ -74,6 +73,7 @@ class ConfigureService {
     pimpNodeList(listparent).map(node =>{
       var id= node.getAttributes.getNamedItem("id").getNodeValue
       var idrow=node.getAttributes.getNamedItem("idLigne").getNodeValue
+      var typeidrow=node.getAttributes.getNamedItem("typeidLigne").getNodeValue
       var tablesource=node.getAttributes.getNamedItem("tablesource").getNodeValue
       var colonnessources=node.getAttributes.getNamedItem("structuresource").getNodeValue
       var colonnescible=node.getAttributes.getNamedItem("structurecible").getNodeValue
@@ -86,7 +86,7 @@ class ConfigureService {
       var tablename=rollbackdoc.createAttribute("nom")
       tablename.setValue(targettable)
       TableHbasedom.setAttributeNode(tablename)
-      aggregation("transformation",id.toInt,idrow,tablesource,colonnessources,colonnescible,targettable, keyjoin)
+      aggregation("transformation",id.toInt,idrow,typeidrow,tablesource,colonnessources,colonnescible,targettable, keyjoin)
 
 
     })
@@ -98,15 +98,14 @@ class ConfigureService {
 
 
 
-    def aggregation(typetransformation:String,incrementaggrega: Int,idrow : String, tablesource: String,colonnessources: String,colonnecible:String,targettable: String, keyjoin: String): Unit =
+    def aggregation(typetransformation:String,incrementaggrega: Int,idrow : String,typeidRow: String, tablesource: String,colonnessources: String,colonnecible:String,targettable: String, keyjoin: String): Unit =
     {
 
 
       var hTable=connection.getTable(TableName.valueOf(targettable))
 
 
-      if(typetransformation=="transformation")
-        {
+
           var dfaggrega = spark.sql("select " + colonnessources + " from " + tablesource )
           var RichKeyList=xpath.compile("//Transformation[@id='"+incrementaggrega+"']/CleRicheDeMappage").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
           var g=0;
@@ -117,8 +116,8 @@ class ConfigureService {
             var bean=userservice.savebeanrowincontext(context,row)
 
             var idexp = parsers.parseExpression(idrow)
-            var id = idexp.getValue(context).asInstanceOf[Long]
-            var put = new Put(Bytes.toBytes("row" + id.toString))
+            var id = String.valueOf(Class.forName(typeidRow).cast(idexp.getValue(context)))
+            var put = new Put(Bytes.toBytes("row" + id))
 
             breakable{
               while(g < RichKeyList.getLength) {
@@ -187,42 +186,46 @@ class ConfigureService {
                 g = g + 1
 
               }
-              soustransformationfunction(context,xpath,parsers,incrementaggrega,idrow,targettable)
+              soustransformationfunction(context,xpath,parsers,incrementaggrega,idrow,typeidRow,targettable)
 
             }
 
           })
-        }
 
-
-            else if(typetransformation=="Document")
-              {
-                var dfaggrega=spark.sql("select " + colonnessources + " from " + tablesource + " where " + keyjoin)
-
-                var r=0
-
-                dfaggrega.toJSON.collectAsList().forEach(row => {
-                  var bean=userservice.savebeanrowincontext(context,row)
-                  var idexp = parsers.parseExpression(idrow)
-                  var id = idexp.getValue(context).asInstanceOf[Long]
-                  var put = new Put(Bytes.toBytes("row" + id.toString))
-                  var colfamily = colonnecible.split(":").apply(0)
-                  var colname = colonnecible.split(":").apply(1)
-                  var rowdom= userservice.createrowdom(id,racine,rollbackdoc,targettable)
-
-                  put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname + " " + r), Bytes.toBytes(bean.toString))
-                  userservice.setattributerowRollback(colfamily,colname + " " + r,targettable,rowdom,rollbackdoc)
-                  hTable.put(put)
-                  r=r+1
-
-                  })
-
-              }
 
       }
 
 
-    def soustransformationfunction(context: StandardEvaluationContext, xpath: XPath, parsers: SpelExpressionParser, incrementaggrega: Int, idrow: String,targettable: String): Unit = {
+
+    def Documentaggregation( incrementaggrega: Int, idrow: String, typeidrow: String, tablesource: String, colonnessources: String, colonnecible: String, targettable: String, keyjoinvalue: String) = {
+
+      var hTable=connection.getTable(TableName.valueOf(targettable))
+
+      var dfaggrega=spark.sql("select " + colonnessources + " from " + tablesource + " where " + keyjoinvalue)
+
+      var r=0
+
+      dfaggrega.toJSON.collectAsList().forEach(row => {
+        var bean=userservice.savebeanrowincontext(context,row)
+        var idexp = parsers.parseExpression(idrow)
+
+        var id =  String.valueOf(Class.forName(typeidrow).cast(idexp.getValue(context)))
+        var put = new Put(Bytes.toBytes("row" + id.toString))
+        var colfamily = colonnecible.split(":").apply(0)
+        var colname = colonnecible.split(":").apply(1)
+        var rowdom= userservice.createrowdom(id,racine,rollbackdoc,targettable)
+
+        put.addColumn(Bytes.toBytes(colfamily), Bytes.toBytes(colname + " " + r), Bytes.toBytes(bean.toString))
+        userservice.setattributerowRollback(colfamily,colname + " " + r,targettable,rowdom,rollbackdoc)
+        hTable.put(put)
+        r=r+1
+
+      })
+
+    }
+
+
+    def soustransformationfunction(context: StandardEvaluationContext, xpath: XPath, parsers: SpelExpressionParser, incrementaggrega: Int, idrow: String,typeidrow:String,targettable: String): Unit = {
 
 
       var subaggregation = xpath.evaluate("//Transformation[@id='"+incrementaggrega+"']/Document", document, XPathConstants.NODESET).asInstanceOf[NodeList]
@@ -242,7 +245,7 @@ class ConfigureService {
         var keyjoinvalue = keyparse.getValue(context).asInstanceOf[String]
 
         subinc = subinc + 1
-        aggregation("Document", incrementaggrega, idrow, tablesource, colonnessources, colonnecible,targettable, keyjoinvalue)
+        Documentaggregation(incrementaggrega, idrow,typeidrow, tablesource, colonnessources, colonnecible,targettable, keyjoinvalue)
         keyjoin = ""
       }
 
