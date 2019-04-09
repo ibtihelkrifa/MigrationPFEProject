@@ -1,0 +1,62 @@
+.toolbar-content  {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+}
+
+.toolbar-content a {
+  text-decoration: none;
+     color: #626262;
+     font-weight: bold;
+     margin-top: 100px;
+
+}
+
+.toolbar-content-left div{
+ margin-left: -230px;
+  
+}
+
+.toolbar-content-right {
+  display: flex;
+  margin-top: 40px;
+
+}
+
+.toolbar-content-right div {
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.header-item {
+  font-size: 20px;
+
+}
+
+.header-item:hover {
+  cursor: pointer;
+  text-decoration: underline !important;
+}
+
+.header{
+  background-color: 	#c9c9c9c4
+  
+
+}
+
+.logo
+{
+  height: 10px;
+  width:100px;
+  margin-left: 450px;
+  margin-top: 50px;
+}
+
+.logo1{
+ margin-left: -250px;
+  height:80px;
+  width:200px;
+}
+
+

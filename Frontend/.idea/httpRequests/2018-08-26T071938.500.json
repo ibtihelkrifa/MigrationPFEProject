@@ -1,0 +1,7 @@
+{
+  "timestamp": "2018-08-26T18:19:37.888+0000",
+  "status": 500,
+  "error": "Internal Server Error",
+  "message": "Unable to find com.vermeg.appportemonnaie.models.User with id 267; nested exception is javax.persistence.EntityNotFoundException: Unable to find com.vermeg.appportemonnaie.models.User with id 267",
+  "path": "/historiquescharge/395"
+}

@@ -1,0 +1,110 @@
+[
+  {
+    "id": 69,
+    "rib": "TN1245987878787878787878",
+    "solde": null,
+    "devise": "DNT",
+    "organisation": "BTK",
+    "etat": "Activé",
+    "porte_monnaies": {
+      "id": 32,
+      "numpm": null,
+      "devise": "DNT",
+      "user": {
+        "id": 31,
+        "mail": "krifa.rim@gmail.com",
+        "nom": "rym",
+        "prenom": "krifa",
+        "mot_de_passe": "rima",
+        "notifications": [],
+        "porteMonnaie": []
+      },
+      "historiques": [],
+      "transaction_debitantes": [],
+      "transaction_creditantes": null,
+      "solde": 0,
+      "compteBancaires": null
+    }
+  },
+  {
+    "id": 63,
+    "rib": "TN1211987654321456987456",
+    "solde": null,
+    "devise": "DNT",
+    "organisation": "STB",
+    "etat": "Activé",
+    "porte_monnaies": {
+      "id": 32,
+      "numpm": null,
+      "devise": "DNT",
+      "user": {
+        "id": 31,
+        "mail": "krifa.rim@gmail.com",
+        "nom": "rym",
+        "prenom": "krifa",
+        "mot_de_passe": "rima",
+        "notifications": [],
+        "porteMonnaie": []
+      },
+      "historiques": [],
+      "transaction_debitantes": [],
+      "transaction_creditantes": null,
+      "solde": 0,
+      "compteBancaires": null
+    }
+  },
+  {
+    "id": 64,
+    "rib": "TN4522145632145632145632",
+    "solde": null,
+    "devise": "DNT",
+    "organisation": "BIAT",
+    "etat": "Activé",
+    "porte_monnaies": {
+      "id": 32,
+      "numpm": null,
+      "devise": "DNT",
+      "user": {
+        "id": 31,
+        "mail": "krifa.rim@gmail.com",
+        "nom": "rym",
+        "prenom": "krifa",
+        "mot_de_passe": "rima",
+        "notifications": [],
+        "porteMonnaie": []
+      },
+      "historiques": [],
+      "transaction_debitantes": [],
+      "transaction_creditantes": null,
+      "solde": 0,
+      "compteBancaires": null
+    }
+  },
+  {
+    "id": 79,
+    "rib": "TN8745987456321456987456",
+    "solde": null,
+    "devise": "DNT",
+    "organisation": "BTK",
+    "etat": "Activé",
+    "porte_monnaies": {
+      "id": 32,
+      "numpm": null,
+      "devise": "DNT",
+      "user": {
+        "id": 31,
+        "mail": "krifa.rim@gmail.com",
+        "nom": "rym",
+        "prenom": "krifa",
+        "mot_de_passe": "rima",
+        "notifications": [],
+        "porteMonnaie": []
+      },
+      "historiques": [],
+      "transaction_debitantes": [],
+      "transaction_creditantes": null,
+      "solde": 0,
+      "compteBancaires": null
+    }
+  }
+]

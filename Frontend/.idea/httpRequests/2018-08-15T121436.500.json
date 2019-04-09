@@ -1,0 +1,7 @@
+{
+  "timestamp": "2018-08-15T11:14:36.243+0000",
+  "status": 500,
+  "error": "Internal Server Error",
+  "message": "Could not write JSON: could not initialize proxy - no Session; nested exception is com.fasterxml.jackson.databind.JsonMappingException: could not initialize proxy - no Session (through reference chain: java.util.ArrayList[0]->com.vermeg.appportemonnaie.models.Historique[\"porte_monnaie\"]->com.vermeg.appportemonnaie.models.Porte_Monnaie_$$_jvstcc6_3[\"numpm\"])",
+  "path": "/historiques"
+}

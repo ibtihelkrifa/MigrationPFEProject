@@ -1,0 +1,7 @@
+{
+  "timestamp": "2018-08-08T16:20:32.237+0000",
+  "status": 500,
+  "error": "Internal Server Error",
+  "message": "Missing URI template variable 'pmid' for method parameter of type Long",
+  "path": "/c/32"
+}

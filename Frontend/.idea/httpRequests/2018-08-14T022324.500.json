@@ -1,0 +1,7 @@
+{
+  "timestamp": "2018-08-14T13:23:24.472+0000",
+  "status": 500,
+  "error": "Internal Server Error",
+  "message": "Could not write JSON: could not initialize proxy - no Session; nested exception is com.fasterxml.jackson.databind.JsonMappingException: could not initialize proxy - no Session (through reference chain: java.util.ArrayList[0]->com.vermeg.appportemonnaie.models.Notification[\"receiver\"]->com.vermeg.appportemonnaie.models.User_$$_jvst776_1[\"mail\"])",
+  "path": "/notifs/126"
+}

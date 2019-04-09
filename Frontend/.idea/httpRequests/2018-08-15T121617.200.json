@@ -1,0 +1,29 @@
+[
+  {
+    "id": 191,
+    "date": null,
+    "porte_monnaie": {
+      "id": 128,
+      "numpm": "194",
+      "solde": 150,
+      "devise": "DNT",
+      "user": {
+        "id": 126,
+        "mail": "a",
+        "nom": "a",
+        "prenom": "a",
+        "mot_de_passe": "a",
+        "notifications": [],
+        "porte_monnaie": null,
+        "notificationsenvoyes": []
+      },
+      "historiques": [],
+      "transaction_debitantes": [],
+      "transaction_creditantes": null,
+      "compteBancaires": null
+    },
+    "statut": "EN ATTENTE",
+    "num_Transaction": 190,
+    "type_Transaction": "Demande de Retrait"
+  }
+]
