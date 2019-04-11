@@ -54,7 +54,7 @@ class ConfigureService {
     val context = new StandardEvaluationContext
     val parsers = new SpelExpressionParser
     // creer le stbales hbases
-    userservice.UserFunctionCreateHbaseTbalesIfNotExists(document,xpath,connection)
+    //userservice.UserFunctionCreateHbaseTbalesIfNotExists(document,xpath,connection)
     // crere  des temp view pour les table sources
     userservice.UserFunctionCreatTempViewOfSOurceTbales(document,xpath,spark)
     // enregistre les fonctiosn client dans SPEL COntext
@@ -75,8 +75,8 @@ class ConfigureService {
       var idrow=node.getAttributes.getNamedItem("idLigne").getNodeValue
       var typeidrow=node.getAttributes.getNamedItem("typeidLigne").getNodeValue
       var tablesource=node.getAttributes.getNamedItem("tablesource").getNodeValue
-      var colonnessources=node.getAttributes.getNamedItem("structuresource").getNodeValue
-      var colonnescible=node.getAttributes.getNamedItem("structurecible").getNodeValue
+     // var colonnessources=node.getAttributes.getNamedItem("structuresource").getNodeValue
+    //  var colonnescible=node.getAttributes.getNamedItem("structurecible").getNodeValue
       var targettable=node.getAttributes.getNamedItem("tablecible").getNodeValue
       var keyjoin=""
       var TableHbasedom=rollbackdoc.createElement("Table")
@@ -86,7 +86,7 @@ class ConfigureService {
       var tablename=rollbackdoc.createAttribute("nom")
       tablename.setValue(targettable)
       TableHbasedom.setAttributeNode(tablename)
-      aggregation("transformation",id.toInt,idrow,typeidrow,tablesource,colonnessources,colonnescible,targettable, keyjoin)
+      aggregation("transformation",id.toInt,idrow,typeidrow,tablesource,targettable, keyjoin)
 
 
     })
@@ -98,16 +98,23 @@ class ConfigureService {
 
 
 
-    def aggregation(typetransformation:String,incrementaggrega: Int,idrow : String,typeidRow: String, tablesource: String,colonnessources: String,colonnecible:String,targettable: String, keyjoin: String): Unit =
+    def aggregation(typetransformation:String,incrementaggrega: Int,idrow : String,typeidRow: String, tablesource: String,targettable: String, keyjoin: String): Unit =
     {
 
 
       var hTable=connection.getTable(TableName.valueOf(targettable))
 
+      var RichKeyList=xpath.compile("//Transformation[@id='"+incrementaggrega+"']/CleRicheDeMappage").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
+      var colonnessources=""
 
+      RichKeyList.foreach(node=>{
+        var colname=node.getAttributes.getNamedItem("colonnesource").getNodeValue
+        colonnessources=colonnessources+","+ colname
+      })
+
+      colonnessources=colonnessources.substring(1)
 
           var dfaggrega = spark.sql("select " + colonnessources + " from " + tablesource )
-          var RichKeyList=xpath.compile("//Transformation[@id='"+incrementaggrega+"']/CleRicheDeMappage").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
           var g=0;
           dfaggrega.toJSON.collectAsList().forEach(row => {
 
@@ -210,7 +217,7 @@ class ConfigureService {
         var idexp = parsers.parseExpression(idrow)
 
         var id =  String.valueOf(Class.forName(typeidrow).cast(idexp.getValue(context)))
-        var put = new Put(Bytes.toBytes("row" + id.toString))
+        var put = new Put(Bytes.toBytes("row" + id))
         var colfamily = colonnecible.split(":").apply(0)
         var colname = colonnecible.split(":").apply(1)
         var rowdom= userservice.createrowdom(id,racine,rollbackdoc,targettable)
@@ -237,8 +244,8 @@ class ConfigureService {
         var sousggregation =subaggregation.item(subinc)
 
         var tablesource = sousggregation.getAttributes.getNamedItem("tablesource").getNodeValue
-        var colonnessources = sousggregation.getAttributes.getNamedItem("structuresource").getNodeValue
-        var colonnecible=sousggregation.getAttributes.getNamedItem("structurecible").getNodeValue
+        var colonnessources = sousggregation.getAttributes.getNamedItem("colonnessources").getNodeValue
+        var colonnecible=sousggregation.getAttributes.getNamedItem("colonnescibles").getNodeValue
 
         var keyjoin = sousggregation.getAttributes.getNamedItem("CleJointure").getNodeValue
         var keyparse = parsers.parseExpression(keyjoin)

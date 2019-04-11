@@ -18,6 +18,7 @@ import org.springframework.cglib.beans.BeanMap
 import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.support.StandardEvaluationContext
 import org.w3c.dom.{Document, Element, Node, NodeList}
+import scala.util.control.Breaks.{break, breakable}
 
 class UserService {
 
@@ -54,7 +55,18 @@ class UserService {
     val pattern= richnode.getAttributes.getNamedItem("pattern").getNodeValue
     val valuenode=richnode.getAttributes.getNamedItem("cartographieformule").getNodeValue
     var value= parsers.parseExpression(valuenode).getValue(context).asInstanceOf[String]
-    val formattedvalue = TestService.FormatDate(value,pattern)
+   // val ignoreifNull=richnode.getAttributes.getNamedItem("ignoreIfNull").getNodeValue.asInstanceOf[Boolean]
+    var formattedvalue=""
+    //if(!ignoreifNull && value==null | value !=null)
+      //{
+
+        formattedvalue = TestService.FormatDate(value,pattern)
+      //}
+    //else
+    //{
+      //return "break"
+    //}
+
 
     return formattedvalue;
   }
@@ -111,9 +123,10 @@ class UserService {
     val transformerFactory = TransformerFactory.newInstance
     val transformer = transformerFactory.newTransformer
     val sources = new DOMSource(rollbackdoc)
-    var Configuration=  xpath.evaluate("//Configuration", document, XPathConstants.NODE).asInstanceOf[Element]
-    val resultat = new StreamResult(new File(Configuration.getAttribute("rollbackfile")))
+    //var Configuration=  xpath.evaluate("//Configuration", document, XPathConstants.NODE).asInstanceOf[Element]
+    val resultat = new StreamResult(new File("rollbackconf.xml"))
     transformer.transform(sources, resultat)
+
   }
 
 
@@ -211,7 +224,6 @@ class UserService {
       if (!admin.tableExists(tableDescriptor.getTableName))
         admin.createTable(tableDescriptor)
 
-
       s = s + 1;
     }
 
@@ -230,15 +242,55 @@ class UserService {
     connectionProperties.put("user", s"${user}")
     connectionProperties.put("password", s"${password}")
     DriverManager.getConnection(jdbcUrl, connectionProperties)
-    var nbtablessources = xpath.evaluate("//StructureSource", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").getLength
+
+    var element1= xpath.evaluate("//Transformation",document,XPathConstants.NODESET).asInstanceOf[NodeList]
+    var tablesources=""
+
+    if(element1.getLength != 0)
+      {
+    tablesources=element1.item(0).getAttributes.getNamedItem("tablesource").getNodeValue
+      }
+
+    var el1=1
+    while(el1 < element1.getLength)
+      {
+
+        tablesources=tablesources+","+element1.item(el1).getAttributes.getNamedItem("tablesource").getNodeValue
+        el1=el1+1
+      }
+
+    var element2= xpath.evaluate("//Document",document,XPathConstants.NODESET).asInstanceOf[NodeList]
+
+    var el2=0
+    /*if(element2.getLength != 0)
+      {
+        tablesources=tablesources+","
+      }*/
+    while(el2 < element2.getLength)
+      {
+        tablesources=tablesources+","+element2.item(el2).getAttributes.getNamedItem("tablesource").getNodeValue
+        el2=el2+1
+      }
+
+    var nbtablessources= tablesources.split(",").length
+
+   // var nbtablessources = xpath.evaluate("//StructureSource", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").getLength
     var tb=0
     while(tb<nbtablessources)
     {
-      var tablename = xpath.evaluate("//StructureSource", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").item(tb).getAttributes.getNamedItem("nom").getNodeValue
+      var tablename= tablesources.split(",").apply(tb)
+      //var tablename = xpath.evaluate("//StructureSource", document, XPathConstants.NODE).asInstanceOf[Element].getElementsByTagName("Table").item(tb).getAttributes.getNamedItem("nom").getNodeValue
       var source_table_1 = spark.read.jdbc(jdbcUrl, tablename, connectionProperties)
+      try{
 
-      source_table_1.createTempView(tablename)
-      tb = tb + 1;
+        source_table_1.createTempView(tablename)
+        tb=tb+1
+      }
+
+      catch
+        {
+          case e: Exception=> tb=tb+1
+        }
 
     }
 

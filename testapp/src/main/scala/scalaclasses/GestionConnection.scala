@@ -3,9 +3,7 @@ package scalaclasses
 import java.io.File
 import java.sql.DriverManager
 import java.util
-import java.util.Properties
 
-import javax.xml.parsers.DocumentBuilderFactory
 import javax.xml.xpath.{XPathConstants, XPathFactory}
 import org.apache.hadoop.hbase.client.{ConnectionFactory, Put, Scan}
 import org.apache.hadoop.hbase.util.Bytes
@@ -18,36 +16,50 @@ import org.w3c.dom.{Element, Node, NodeList}
 import java.sql.DatabaseMetaData
 import java.sql.Connection
 import java.sql.DriverManager
+
 import org.apache.hadoop.hbase.util.Bytes
 import java.util
+
 import scala.collection.JavaConversions._
 import org.apache.hadoop.hbase.client.Result
+
 import scala.util.control.Breaks.breakable
 
 class GestionConnection {
 
 
 
-  def function():String= {
+ class Column (nomcolonne:String,typecolonne:String){
 
-   return "done"
-    }
+   def getcolumnname(): String={
+     return nomcolonne
+   }
+
+   def gettypecolumn():String={
+     return typecolonne
+   }
+
+   override def toString: String =
+     s"($nomcolonne, $typecolonne)"
+ }
 
 
 
-  def getColumnNamesMysqlTable(jdbcConnection :Connection ,tablename:String): util.ArrayList[String] =
+  def getColumnNamesMysqlTable(jdbcConnection :Connection ,tablename:String):java.util.ArrayList[Column] =
   {
    try{
     val md = jdbcConnection.getMetaData
 
     val rs = md.getColumns(jdbcConnection.getCatalog, null,tablename, null)
-    var a=""
-
-    var list= new util.ArrayList[String]()
+    var nomcolonne=""
+    var typecolonne=""
+    var list= new util.ArrayList[Column]()
     while(rs.next())
     {
-      a=rs.getString("COLUMN_NAME")
-      list.add(a)
+      nomcolonne=rs.getString("COLUMN_NAME")
+      typecolonne=rs.getString("TYPE_NAME")
+
+      list.add(new Column(nomcolonne,typecolonne))
     }
 
 
@@ -168,6 +180,37 @@ class GestionConnection {
 
     return columnList
 
+  }
+
+
+
+
+
+  def getColumnTypesMysqlTable(jdbcConnection :Connection ,tablename:String): util.ArrayList[String] =
+  {
+    try{
+      val md = jdbcConnection.getMetaData
+
+      val rs = md.getColumns(jdbcConnection.getCatalog, null,tablename, null)
+      var a=""
+
+      var list= new util.ArrayList[String]()
+      while(rs.next())
+      {
+        a=rs.getString("TYPE_NAME")
+        list.add(a)
+      }
+
+
+      return list
+    }
+    catch
+      {
+        case e: Exception =>
+          print(e)
+          return null
+
+      }
   }
 
 }

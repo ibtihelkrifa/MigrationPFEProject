@@ -27,26 +27,27 @@ class BeanGenerators(var json: JSONObject) {
     def guessValueClass(value: Object): Class[_] = {
 
       try{
-        if(value.isInstanceOf[Integer])
-          return classOf[Integer]}
+        if(value.isInstanceOf[java.lang.Integer])
+          return classOf[java.lang.Integer]}
       catch {
         case e1: NumberFormatException =>
       }
+
       try {
-        if (value.isInstanceOf[Long])
-          return classOf[Long]
+        if (value.isInstanceOf[java.lang.Long])
+          return classOf[java.lang.Long]
       }
       catch {
         case e1: NumberFormatException =>
       }
 
       try{
-        if(value.isInstanceOf[Double])
-         return classOf[Double]}
+        if(value.isInstanceOf[java.lang.Double])
+         return classOf[java.lang.Double]}
       catch {
         case e1: NumberFormatException =>
       }
-      classOf[String]
+      return  classOf[java.lang.String]
       }
 
 

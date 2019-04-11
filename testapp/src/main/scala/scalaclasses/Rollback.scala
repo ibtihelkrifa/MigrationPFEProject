@@ -25,7 +25,8 @@ class Rollback {
 
     val docBuilderFactory = DocumentBuilderFactory.newInstance
     val docBuilder = docBuilderFactory.newDocumentBuilder
-    val document = docBuilder.parse(new File(path))
+    var f1= new File(path)
+    val document = docBuilder.parse(f1)
     val xpathFactory = XPathFactory.newInstance
     val xpath = xpathFactory.newXPath
 
@@ -57,6 +58,8 @@ class Rollback {
       }
 
 
+
+    f1.delete()
     return "done"
 
   }

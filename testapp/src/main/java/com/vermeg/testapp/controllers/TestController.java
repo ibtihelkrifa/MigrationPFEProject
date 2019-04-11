@@ -4,6 +4,8 @@ package com.vermeg.testapp.controllers;
 import org.springframework.web.bind.annotation.*;
 import scalaclasses.*;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.List;
 
 @RestController
@@ -46,6 +48,22 @@ public class TestController {
     }
 
 
+
+    @GetMapping("test7/")
+    public String getColumnTypesMysqlTable()
+    {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            String jdbcURL = "jdbc:mysql://localhost:3306/TestPFE";
+
+            Connection jdbcConnection = DriverManager.getConnection(jdbcURL, "root", "root");
+            return new GestionConnection().getColumnTypesMysqlTable(jdbcConnection,"user").get(0);
+        }
+        catch (Exception e)
+        {
+            return e.getMessage();
+        }
+    }
 
 
 

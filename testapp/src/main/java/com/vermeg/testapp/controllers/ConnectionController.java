@@ -1,6 +1,7 @@
 package com.vermeg.testapp.controllers;
 
 
+import com.sun.javafx.collections.MappingChange;
 import com.vermeg.testapp.models.*;
 import com.vermeg.testapp.services.ConnectionService;
 import org.apache.hadoop.hbase.HBaseConfiguration;
@@ -13,7 +14,9 @@ import javax.ws.rs.DELETE;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/")
@@ -60,13 +63,16 @@ public class ConnectionController {
 
              for(int k=0; k< listtables.size();k++) {
 
-                 ArrayList<String>  colonnes = gestionConnection.getColumnNamesMysqlTable(jdbcConnection, listtables.get(k).getNomTable());
+
+
+                List<GestionConnection.Column> colonnes=gestionConnection.getColumnNamesMysqlTable(jdbcConnection, listtables.get(k).getNomTable());
 
                  for (int j = 0; j < colonnes.size(); j++) {
-                   if(! connectionService.existColumnR(colonnes.get(j)))
+                   if(! connectionService.existColumnR(colonnes.get(j).getcolumnname()))
                    {
                      ColonneR colonneR = new ColonneR();
-                     colonneR.setNomcolonne(colonnes.get(j));
+                     colonneR.setNomcolonne(colonnes.get(j).getcolumnname());
+                     colonneR.setTypecolonne(colonnes.get(j).gettypecolumn());
                      colonneR.setTable(listtables.get(k));
                      connectionService.savecolonneR(colonneR);
                  }}
