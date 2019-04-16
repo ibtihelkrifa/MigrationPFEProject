@@ -1,0 +1,279 @@
+<form [formGroup]="transformationForm">
+
+  <a (click)="hide(index)">
+    <i class="fa fa-eye"></i>&nbsp;&nbsp; <b class="tran">transformation Numéro:&nbsp;</b> &nbsp;&nbsp; <b><i
+        class="number">{{index}}</i></b>
+  </a>
+
+  <div id="{{index}}">
+    <!--**************************************start betbet (click)="addRichKey()"******************************************************-->
+    <div class="global">
+      <div class="inhedden">
+        <input matInput formControlName="id" value="{{index}}" placeholder="Num Transformation" style="display: none">
+      </div>
+      <div class="col-md-12" style="display: inline-block;border-style: solid;">
+        <div class="row">
+          <button class="btn btn-danger" id="tooltip" (click)="delete()" style="float: right;margin: 5px;">
+            <span class="tooltiptext">Effacer transformation</span>
+            <i class="fa fa-trash"></i>
+          </button>
+
+          <button class="btn btn-info" id="tooltip" (click)="addRichKey()" style="float: right;margin: 5px;">
+            <span class="tooltiptext">Ajouter un mappage</span>
+            <i class="fa fa-plus"></i>
+          </button>
+
+        </div>
+
+        <div class="col-md-6">
+          <mat-form-field style="display: inline-block;">
+            <mat-label>Selectionner Table Source</mat-label>
+            <mat-select (selectionChange)="getSourceColumns()" formControlName="tablesource">
+              <ng-container *ngFor="let s of tablessources$">
+                <mat-option value="{{s.nomTable}}">{{s.nomTable}}</mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field style="display: inline-block;">
+            <mat-label>Selectionner Table Cible</mat-label>
+            <mat-select formControlName="tablecible">
+              <ng-container *ngFor="let s of tablescibles$">
+                <mat-option value="{{s.nomTable}}">{{s.nomTable}}</mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field>
+            <mat-label>Selectionner idLigne</mat-label>
+            <mat-select formControlName="idLigne">
+              <ng-container *ngFor="let c of colonnessource$">
+                <mat-option value="#{{c.nomcolonne}}">{{c.nomcolonne}}</mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6">
+          <mat-form-field>
+            <mat-label>Selectionner type idLigne</mat-label>
+            <mat-select formControlName="typeidLigne">
+              <mat-option value="java.lang.Long">Long</mat-option>
+              <mat-option value="java.lang.String">Varchar</mat-option>
+              <mat-option value="java.lang.Float">Float</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <hr>
+        <div class="col-md-12">
+          <ul>
+            <li *ngFor="let richkey of richkeys?.controls; let j = index">
+              <form [formGroup]="richkey">
+                <!--**********************Start sous Betbet**********************************-->
+                 <div class="row" style="display: inline-block;border-style: solid;border-color: turquoise">
+                 
+             
+                 
+                 
+                  <div class="col-md-4">
+                      <mat-label>Selectionner Les Colonnes</mat-label><br>
+                      <mat-select (selectionChange)="getSelectedRadioButton($event)">
+                        <ng-container *ngFor="let c of colonnessource$">
+                          <mat-option value="#{{c.nomcolonne}}">{{c.nomcolonne}}</mat-option>
+                        </ng-container>
+                      </mat-select>
+                  </div>
+                  <div class="col-md-4">
+                      <mat-label>Ajouter Un Opperateur</mat-label>
+                      <mat-select (selectionChange)="getChangeOpperator($event)">
+                        <mat-option value="+">+</mat-option>
+                        <mat-option value="-">-</mat-option>
+                        <mat-option value="+">*</mat-option>
+                      </mat-select>
+                  </div>
+                  <div class="col-md-4">
+                      <mat-label>Ajouter Une Fonction</mat-label>
+                      <mat-select (click)="getChangeFunction($event)">
+                        <mat-option value="getAge">getAge()</mat-option>
+                      </mat-select>
+                  </div>
+                  <div class="col-md-4">
+                      <input matInput id="inputMap" [value]="inputTextMap" placeholder="Saisir Votre Formule De Mappage"
+                      formControlName="mappingformula">
+                  </div>
+                 </div>
+                <!--**********************Start sous Betbet**********************************-->
+                <!--<table>
+                  <tr>
+                    <td>
+                      <mat-label>Selectionner Les Colonnes</mat-label><br>
+                      <mat-radio-group (change)="getSelectedRadioButton($event)">
+                        <ng-container *ngFor="let c of colonnessource$">
+                          <mat-radio-button value="#{{c.nomcolonne}}">{{c.nomcolonne}}</mat-radio-button>
+                        </ng-container>
+                      </mat-radio-group>
+                    </td>
+
+                    <td>
+                      <mat-label>Ajouter Un Opperateur</mat-label>
+                      <mat-select (selectionChange)="getChangeOpperator($event)">
+                        <mat-option value="+">+</mat-option>
+                        <mat-option value="-">-</mat-option>
+                        <mat-option value="+">*</mat-option>
+                      </mat-select>
+                    </td>
+
+                    <td>
+                      <mat-label>Ajouter Une Fonction</mat-label>
+                      <mat-select (click)="getChangeFunction($event)">
+                        <mat-option value="getAge">getAge()</mat-option>
+                      </mat-select>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <input matInput id="inputMap" [value]="inputTextMap" placeholder="Saisir Votre Formule De Mappage"
+                        formControlName="mappingformula">
+                    </td>
+                  </tr>
+                </table>-->
+              </form>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+    <!--********************************************end betbet*******************************************-->
+    <!--<table>
+
+      <tr>
+        <input matInput formControlName="id" value="{{index}}" placeholder="Num Transformation" style="display: none">
+      </tr>
+      <tr>
+
+        <td>
+          <mat-form-field>
+            <mat-label>Selectionner Table Source</mat-label>
+            <mat-select (selectionChange)="getSourceColumns()" formControlName="tablesource">
+              <ng-container *ngFor="let s of tablessources$">
+                <mat-option value="{{s.nomTable}}">{{s.nomTable}}</mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </td>
+        <td>
+          <mat-form-field>
+            <mat-label>Selectionner Table Cible</mat-label>
+            <mat-select formControlName="tablecible">
+              <ng-container *ngFor="let s of tablescibles$">
+                <mat-option value="{{s.nomTable}}">{{s.nomTable}}</mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </td>
+
+        <td>
+          <button class="delete-button" (click)="delete()">Delete</button>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <mat-form-field>
+            <mat-label>Selectionner idLigne</mat-label>
+            <mat-select formControlName="idLigne">
+              <ng-container *ngFor="let c of colonnessource$">
+                <mat-option value="#{{c.nomcolonne}}">{{c.nomcolonne}}</mat-option>
+              </ng-container>
+            </mat-select>
+          </mat-form-field>
+        </td>
+        <td>
+          <mat-form-field>
+            <mat-label>Selectionner type idLigne</mat-label>
+            <mat-select formControlName="typeidLigne">
+              <mat-option value="java.lang.Long">Long</mat-option>
+              <mat-option value="java.lang.String">Varchar</mat-option>
+              <mat-option value="java.lang.Float">Float</mat-option>
+
+
+            </mat-select>
+          </mat-form-field>
+        </td>
+      </tr>
+
+
+    </table>
+
+
+    <a (click)="addRichKey()"><i class="material-icons">
+        add
+      </i>
+    </a>
+
+
+    <ul>
+      <li *ngFor="let richkey of richkeys?.controls; let j = index">
+        <form [formGroup]="richkey">
+          <table>
+            <tr>
+              <td>
+                <mat-label>Selectionner Les Colonnes</mat-label><br>
+                <mat-radio-group (change)="getSelectedRadioButton($event)">
+                  <ng-container *ngFor="let c of colonnessource$">
+                    <mat-radio-button value="#{{c.nomcolonne}}">{{c.nomcolonne}}</mat-radio-button>
+                  </ng-container>
+                </mat-radio-group>
+              </td>
+
+              <td>
+                <mat-label>Ajouter Un Opperateur</mat-label>
+                <mat-select (selectionChange)="getChangeOpperator($event)">
+                  <mat-option value="+">+</mat-option>
+                  <mat-option value="-">-</mat-option>
+                  <mat-option value="+">*</mat-option>
+                </mat-select>
+              </td>
+
+              <td>
+                <mat-label>Ajouter Une Fonction</mat-label>
+                <mat-select (click)="getChangeFunction($event)">
+                  <mat-option value="getAge">getAge()</mat-option>
+                </mat-select>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input matInput id="inputMap" [value]="inputTextMap" placeholder="Saisir Votre Formule De Mappage"
+                  formControlName="mappingformula">
+              </td>
+            </tr>
+          </table>
+        </form>
+      </li>
+    </ul>-->  
+
+  </div>
+
+</form>
+<mat-divider></mat-divider>
+<br><br>
+
+
+<!--<ngx-smart-modal #FunctionModal identifier="FunctionModal">
+  <form [formGroup]="FunctionForm">
+
+    <mat-radio-group formControlName="FunctionOnColumn">
+      <ng-container *ngFor="let c of colonnessource$">
+        <mat-radio-button value="#{{c.nomcolonne}}">{{c.nomcolonne}}</mat-radio-button>
+      </ng-container>
+    </mat-radio-group>
+
+  </form>
+
+
+  <button mat-button type="button" class="button" (click)="closeModal('FunctionModal')">Annuler</button>
+</ngx-smart-modal>-->

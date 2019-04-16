@@ -235,5 +235,15 @@ public class ConnectionService {
         return true;
     }
 
+    public List<TableSource> getAllTableSources()
+    {
+        return this.tableSourceRepository.findAll();
+    }
+
+
+    public List<TableCible> getAllTablesCibles()
+    {
+        return this.tableCibleRepository.findAll();
+    }
 
 }

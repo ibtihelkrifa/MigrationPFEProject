@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
 
-    @Autowired
+  /*  @Autowired
     UserRepository userRepository;
 
     public User getUserBymail(String mail)
@@ -22,6 +22,6 @@ public class UserService {
     {
         System.out.print("hi");
         return userRepository.save(user);
-    }
+    }*/
 
 }

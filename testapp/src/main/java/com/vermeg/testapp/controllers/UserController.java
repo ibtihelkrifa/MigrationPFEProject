@@ -15,7 +15,7 @@ public class UserController {
     UserService userService;
 
 
-    @GetMapping("/users/{email}")
+  /*  @GetMapping("/users/{email}")
      public User getUser(@PathVariable String email)
     {
         return userService.getUserBymail(email);
@@ -26,6 +26,6 @@ public class UserController {
     {
       return  this.userService.createUser(user);
     }
-
+*/
 
 }

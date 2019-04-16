@@ -1,0 +1,79 @@
+.admin-panel {
+  margin: 8% 10%;
+}
+
+.header-icon {
+  font-size: 50px;
+}
+
+#gauche{
+  position:relative;
+  width:60%;
+}
+#droite
+{
+    position:relative;
+    left: 60%,
+}
+
+.button
+{
+  color: #575454
+}
+.example-card
+{
+  font-weight: bold;
+  color: #d83431
+
+}
+
+.conf-button{
+  margin-left: 1200px;
+}
+.panel-dark{
+  margin-top: 94px;
+  background-color: #000;
+  color: #fff;
+}
+
+.panel-body{
+  border-style: solid;
+  color: #000;
+}
+#margins{
+  width: 150px !important;
+}
+.btn-default {
+  font-family: Raleway-SemiBold;
+  font-size: 13px;
+  color: #d83431;
+  letter-spacing: 1px;
+  line-height: 15px;
+  border: 2px solid #d83431;
+  border-radius: 40px;
+  background: transparent;
+  transition: all 0.3s ease 0s;
+  
+}
+
+.btn-success {
+  font-family: Raleway-SemiBold;
+  font-size: 13px;
+  color: #31d885;
+  letter-spacing: 1px;
+  line-height: 15px;
+  border: 2px solid #31d885;
+  border-radius: 40px;
+  background: transparent;
+  transition: all 0.3s ease 0s;
+}
+
+.btn-default:hover {
+  color: #FFF;
+  background: #d83431;
+  border: 2px solid #d83431;
+}
+
+
+
+

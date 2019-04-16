@@ -21,10 +21,10 @@
     <Transformations>
 
         <Transformation  id="0" typeidLigne="java.lang.Long" idLigne="#numEtudiant" tablesource="etudiant" tablecible="STUDENTS"  >
-            <CleRicheDeMappage idpere="0" colonnesource="numEtudiant" type="java.lang.Long" colonnecible="FAMILY_STUDENT:id" cartographieformule="#numEtudiant"/>
-            <CleRicheDeMappage idpere="0" colonnesource="nom,prenom" type="java.lang.String" colonnecible="FAMILY_STUDENT:Nom" cartographieformule="#nom+' '+#prenom"/>
-            <CleRicheDeMappage idpere="0" colonnesource="email" type="java.lang.String" colonnecible="FAMILY_STUDENT:email" cartographieformule="#email"/>
-            <CleRicheDeMappage idpere="0" colonnesource="birthDate" type="java.lang.Integer" colonnecible="FAMILY_STUDENT:age" cartographieformule="#getAge(#birthDate)"/>
+            <CleRicheDeMappage  colonnesource="numEtudiant" type="java.lang.Long" colonnecible="FAMILY_STUDENT:id" cartographieformule="#numEtudiant"/>
+            <CleRicheDeMappage  colonnesource="nom,prenom" type="java.lang.String" colonnecible="FAMILY_STUDENT:Nom" cartographieformule="#nom+' '+#prenom"/>
+            <CleRicheDeMappage  colonnesource="email" type="java.lang.String" colonnecible="FAMILY_STUDENT:email" cartographieformule="#email"/>
+            <CleRicheDeMappage  colonnesource="birthDate" type="java.lang.Integer" colonnecible="FAMILY_STUDENT:age" cartographieformule="#getAge(#birthDate)"/>
         </Transformation>
 
 
@@ -33,7 +33,7 @@
         <Transformation  id="1" typeidLigne="java.lang.Long" idLigne="#USERId" tablesource="user" tablecible="EMPLOYEES"  >
 
             <CleRicheDeMappage  colonnesource="salaire" type="java.lang.String" converter="NumberConverter" ignoreIfNull="false"  pattern="###,###.##" cartographieformule="#salaire *#tauxr" condition="#salaire gt 300 ? true : false" colonnecible="FAMILY_EMPLOYEE:Salaire"/>
-            <CleRicheDeMappage  colonnesource="taille" type="java.lang.Double" cartographieformule="#taille" condition="#taille gt 2 ? true : false" colonnecible="FAMILY_EMPLOYEE:Taille"/>
+            <CleRicheDeMappage  colonnesource="taille" type="java.lang.Double" cartographieformule="#taille" condition="#taille gt 2 ? true : false" colonnecible="FAMILY_EMPLOYEE:Ta                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ille"/>
             <CleRicheDeMappage  colonnesource="birthDate" type="java.lang.Integer" cartographieformule="#getAge(#birthDate)" colonnecible="FAMILY_EMPLOYEE:Age"/>
             <CleRicheDeMappage  colonnesource="birthDate" converter="convertDateTime" pattern="MM/dd/yyyy" ignoreIfNull="true"  type="java.lang.String" cartographieformule="#birthDate" colonnecible="FAMILY_EMPLOYEE:BirthDate"/>
             <CleRicheDeMappage  colonnesource="FirstName,LastName" type="java.lang.String" cartographieformule="#firstName+' '+#lastName" colonnecible="FAMILY_EMPLOYEE:FullName"/>

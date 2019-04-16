@@ -1,0 +1,44 @@
+<app-header></app-header>
+<div class="container">
+  <div class="row">
+    <div class="margins">
+      <div class="panel panel-defaults">
+        <div class="panel-heading">Configuration </div>
+        <div class="panel-body">
+
+          <form [formGroup]="confForm">
+        <div class="row">
+          <div class="col-md-6">
+            <mat-form-field>
+              <mat-label>Selectionner Le Type De Votre Simulation </mat-label>
+              <mat-select formControlName="typesimulation">
+                <mat-option value="Réel">Réel</mat-option>
+                <mat-option value="Simulation">Simulation</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <button class="btn btn-success" id="tooltip" (click)="addTransformation()" style="float: right;"><i class="fa fa-plus"></i>
+              <span class="tooltiptext">Ajouter transformation</span>
+            </button>
+          </div>
+          </div>
+            <ul>
+              <li *ngFor="let transformation of transformations?.controls; let i = index">
+                <app-transformation [index]="i" [transformationForm]="transformation"
+                  (deleteTransformation)="deleteTransformation($event)"></app-transformation>
+              </li>
+            </ul>
+
+            <button type="submit" class="sub" (click)="saveTransformation()"
+              [disabled]="confForm.invalid">Submit</button><br><br>
+            <pre>Parent Form Status: <span class="status">{{confForm.status}}</span></pre>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row"></div>
+</div>
+<br><br><br><br><br><br>
+<app-footer></app-footer>
