@@ -106,15 +106,34 @@ class ConfigureService {
 
       var RichKeyList=xpath.compile("//Transformation[@id='"+incrementaggrega+"']/CleRicheDeMappage").evaluate(document,XPathConstants.NODESET).asInstanceOf[NodeList]
       var colonnessources=""
+      var condition=""
 
       RichKeyList.foreach(node=>{
         var colname=node.getAttributes.getNamedItem("colonnesource").getNodeValue
         colonnessources=colonnessources+","+ colname
+        if(node.getAttributes.getNamedItem("condition")!= null)
+          {
+            condition=condition+" and "+ node.getAttributes.getNamedItem("condition").getNodeValue
+          }
+
       })
+
+      if(condition.length != 0)
+        {
+          condition=condition.substring(4);
+        }
+      else
+      {
+        condition="true"
+      }
+
 
       colonnessources=colonnessources.substring(1)
 
-          var dfaggrega = spark.sql("select " + colonnessources + " from " + tablesource )
+
+          var dfaggrega = spark.sql("select " + colonnessources + " from " + tablesource +" where " +condition )
+
+
           var g=0;
           dfaggrega.toJSON.collectAsList().forEach(row => {
 
@@ -126,19 +145,13 @@ class ConfigureService {
             var id = String.valueOf(Class.forName(typeidRow).cast(idexp.getValue(context)))
             var put = new Put(Bytes.toBytes("row" + id))
 
-            breakable{
               while(g < RichKeyList.getLength) {
 
                 var richnode = RichKeyList.item(g)
                 var condition=true
-                if(richnode.getAttributes.getNamedItem("condition") != null)
-                  {
-                    var conditonattribute=richnode.getAttributes.getNamedItem("condition").getNodeValue
-                    condition= parsers.parseExpression(conditonattribute).getValue(context).asInstanceOf[Boolean]
-                  }
 
-                if(condition)
-                  {
+
+
 
                     var finalvalue=""
 
@@ -179,23 +192,14 @@ class ConfigureService {
                     hTable.put(put)
                     userservice.setattributerowRollback(colfamily,colname,targettable,rowdom,rollbackdoc)
 
-                  }
 
-                else
-                {
-
-                  val d = new Delete(Bytes.toBytes("row" + id))
-                  hTable.delete(d)
-                  break
-
-                }
 
                 g = g + 1
 
               }
               soustransformationfunction(context,xpath,parsers,incrementaggrega,idrow,typeidRow,targettable)
 
-            }
+
 
           })
 
