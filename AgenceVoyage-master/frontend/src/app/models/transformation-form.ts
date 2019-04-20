@@ -32,9 +32,9 @@ export class TransformationForm {
   }
   this.idLigne.setValidators([Validators.required])
 
-  if(transformation.id)
+  if(transformation.idtransformation)
   {
-    this.id.setValue([transformation.id])
+    this.id.setValue([transformation.idtransformation])
   }
 
   if(transformation.typeidLigne)

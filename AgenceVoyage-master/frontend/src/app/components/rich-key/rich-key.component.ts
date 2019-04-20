@@ -8,7 +8,7 @@ import { FormGroup } from '@angular/forms';
 })
 export class RichKeyComponent implements OnInit {
 
-  @Input() richKeyForm: FormGroup
+  @Input() richKey: FormGroup
   @Input() index2: number
   @Output() deleteRichKey: EventEmitter<number> = new EventEmitter()
   constructor() { }

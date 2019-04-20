@@ -12,6 +12,7 @@ import { Transformation } from '../../models/transformation';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { MatRadioChange, MatRadioButton, MatSelectChange, MatCheckboxClickAction } from '@angular/material';
 import { NgxSmartModalService } from 'ngx-smart-modal';
+import * as $ from 'jquery';
 
 @Component({
   selector: 'app-transformation',
@@ -27,21 +28,28 @@ export class TransformationComponent implements OnInit {
   colonnessource$: any;
   showorhidevalue="fermer"
   richkeys: FormArray
-  richkey: FormGroup
-  FunctionModal:FormGroup
-  FunctionOnColumn:FormControl
+  idrichkey=0
+  selecteds:any;
+  draggedCar:any;
+  availableCars:any;
+  multipleSelected= new Array();
+  cols:any;
+  selectedCars= '';
+  colonnescibles$: any;
+  cibledragged: any;
+  cibleselected= '';
+  colscible: { field: string; header: string; width: string; }[];
+ 
+
   constructor(private conService: ConnectionService ,private formBuilder: FormBuilder,public ngxSmartModalService: NgxSmartModalService) { }
    inputTextMap=""
    FunctionForm:FormGroup
-  ngOnInit() {
 
-    
-  
-    
+   ngOnInit() {
   
     this.richkeys=this.transformationForm.get('richkeys') as FormArray
 
-    this.transformationForm.controls['id'].disable()
+   // this.transformationForm.controls['id'].disable()
     this.conService.getAllTablessSources().subscribe(
      data =>{
          this.tablessources$=data
@@ -52,6 +60,46 @@ export class TransformationComponent implements OnInit {
     this.tablescibles$=data
   })
 
+  this.cols = [
+    { field: 'nomcolonne', header: 'Nom Colone', width: '25%'}
+];
+
+this.colscible=[
+  { field: 'nomcolonneFamily', header: 'Nom Famille de colonne', width:'25%'}
+]
+
+  }
+
+  selected(value:any,j:any){
+  value='#'+value;
+  this.selecteds=value;
+    console.log(value)
+  }
+
+  show(id1:any,id3:any,id2:any)
+  {
+    var x=document.getElementById(id1+id3+id2)
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    }
+  }
+
+  hideconvertisseur(id1:any,id3:any,id2:any)
+  {
+    var x=document.getElementById(id1+id3+id2)
+    if (x.style.display === "block") {
+      x.style.display = "none";
+    }
+  }
+
+  hidepanel(id1:any,id3:any,id2:any)
+  {
+    var x=document.getElementById(id1+id3+id2)
+    if (x.style.display === "none") {
+      x.style.display = "block";
+    } else {
+      x.style.display = "none";
+    }
   }
 
   hide(index:any)
@@ -64,6 +112,13 @@ export class TransformationComponent implements OnInit {
     }
   }
 
+
+  deleterichkey(index:any,j:any)
+  {
+    var x=document.getElementById('richkey'+index+j)
+
+  }
+
   delete() {
     this.deleteTransformation.emit(this.index)
   }
@@ -72,43 +127,100 @@ export class TransformationComponent implements OnInit {
   {
     const tablesourceIndex = this.tablessources$.findIndex(el => el.nomTable == this.transformationForm.value.tablesource)
     this.colonnessource$=this.tablessources$[tablesourceIndex].colonnes
-
-    
+    this.availableCars=this.colonnessource$
   }
+
+  getCibleColumns(){
+    const tablecibleindex=this.tablescibles$.findIndex(el => el.nomTable== this.transformationForm.value.tablecible)
+    this.colonnescibles$=this.tablescibles$[tablecibleindex].colonnesfamille
+  }
+
+
+
 
   addRichKey()
   {
 
-
+    
        const currentrichkeys= this.transformationForm.get('richkeys') as FormArray
        currentrichkeys.push(
          this.formBuilder.group(
             new RichKeyForm( new RichKey())
          )
        )
-
-
+       this.selectedCars=""
+       this.cibleselected=""
   }
 
-  getSelectedRadioButton(Change:MatSelectChange)
-  {
-    this.inputTextMap=this.inputTextMap+Change.value
 
+  getChangeOpperator(change:any, index: number,j:number)
+  {
+    this.selectedCars=this.selectedCars+change
+    $('#name'+index+j).val(this.selectedCars);
   }
 
-  getChangeOpperator(change: MatSelectChange)
+  getChangeFunction(change: any,index:number,j:number)
   {
-    this.inputTextMap=this.inputTextMap+change.value
+    this.selectedCars=this.selectedCars+change
+    $('#name'+index+j).val(this.selectedCars);
 
-  }
-
-  getChangeFunction()
-  {
-    this.ngxSmartModalService.open("FunctionModal")
 
   }
   
+  getVg(change:any, index:number,j:number)
+  {
+    this.selectedCars=this.selectedCars+change
+    $('#name'+index+j).val(this.selectedCars);
+
+  }
+
   closeModal(modalName: string) { this.ngxSmartModalService.close(modalName) }
 
+  dragStart(event,car: any) {
+    this.draggedCar = '#'+car;
+}
+
+dragCibleStart(event,cibledrag:any)
+{
+  this.cibledragged=cibledrag
+}
+dragEnd(event) {
+  this.draggedCar = null;
+}
+dragCibleEnd(event)
+{
+  this.cibledragged=null;
+}
+
+drop(event, index:number,j:number) {
+  if(this.draggedCar) {
+   //   let draggedCarIndex = this.findIndex(this.draggedCar);
+      this.selectedCars = this.selectedCars+this.draggedCar;
+      
+      
+      $('#name'+index+j).val(this.selectedCars);
+     // this.availableCars = this.availableCars.filter((val,i) => i!=draggedCarIndex);
+      this.draggedCar = null;
+  }
+}
+
+dropcible(event,index:number,j:number)
+{
+  if(this.cibledragged)
+  {
+    this.cibleselected=this.cibledragged;
+    $('#cible'+index+j).val(this.cibleselected);
+     this.cibledragged=null
+  }
+
+}
+
+getSelectedMultiple(event:any){
+ 
+  this.multipleSelected.push(event.target.value);
+  console.log(event.target.value);
+  
+
+}
 
 }

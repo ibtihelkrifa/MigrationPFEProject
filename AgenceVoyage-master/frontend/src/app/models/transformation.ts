@@ -1,7 +1,7 @@
 import { RichKey } from './rich-key';
 
 export class    Transformation {
-id: String
+idtransformation: any
 tablesource: String
 tablecible: String
 idLigne: String

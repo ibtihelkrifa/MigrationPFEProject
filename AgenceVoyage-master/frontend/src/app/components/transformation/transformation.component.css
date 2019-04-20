@@ -64,3 +64,9 @@
   #tooltip:hover .tooltiptext {
     visibility: visible;
   }
+  .mat-select{
+      width: 97% !important;
+  }
+  ul {
+    list-style-type: none;
+}

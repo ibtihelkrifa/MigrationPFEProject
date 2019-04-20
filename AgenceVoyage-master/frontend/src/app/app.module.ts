@@ -35,12 +35,12 @@ import { RichKeyComponent } from './components/rich-key/rich-key.component';
 import {MatRadioModule, MatRadioButton} from '@angular/material/radio';
 import { Page404NotFoundComponent } from './components/page404-not-found/page404-not-found.component';
 import { AuthInterceptor } from './models/authorization/auth-interceptor';
-
+import {DragDropModule} from 'primeng/dragdrop';
+import {TableModule} from 'primeng/table';
 
 @NgModule({
   declarations: [
     AppComponent,
-    
     HeaderComponent,
     AdminComponent,
     LoginComponent,
@@ -55,7 +55,8 @@ import { AuthInterceptor } from './models/authorization/auth-interceptor';
   ],
   imports: [
     NgxSmartModalModule.forRoot(),
-     
+    DragDropModule,
+    TableModule,
     MatSidenavModule,
     BrowserModule,
     AppRoutingModule,

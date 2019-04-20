@@ -36,52 +36,6 @@ export class LoginComponent implements OnInit {
 
   alert: string
 
- /* onSubmit() {
-    const { username, password } = this.signInForm.value
-    this.Auth.getUserbyMail(username).subscribe(user => {
-      if (user != null) {
-        
-          if (user.password == password) {
-            
-            this.router.navigate(['/Admin']);
-          } 
-          
-          else {
-            this.alert = "verifier votre mot de passe"
-          }
-        
-      }
-       else {
-        this.alert = "Vous n'avez pas un compte"
-      }
-    })
-  }*/
-
-
-  onSubmit2() {
-    const { username, password } = this.signInForm.value
-
-    this.loginInfo = new AuthLoginInfo(username,password);
-
-    this.authService.attemptAuth(this.loginInfo).subscribe(
-      data => {
-        this.tokenStorage.saveToken(data.accessToken);
-        this.tokenStorage.saveUsername(data.username);
-
-        this.isLoginFailed = false;
-        this.isLoggedIn = true;
-        this.reloadPage();
-        this.router.navigate(['/Admin']);
-
-
-      },
-      error => {
-        console.log(error);
-        this.errorMessage = error.error.message;
-        this.isLoginFailed = true;
-      }
-    );
-  }
 
 
   onSubmit() {
