@@ -7,7 +7,6 @@ export class TransformationForm {
     tablesource = new FormControl()
     tablecible = new FormControl()
     idLigne= new FormControl()
-    id= new FormControl()
     typeidLigne= new FormControl()
     richkeys = new FormArray([])
     constructor(
@@ -23,7 +22,7 @@ export class TransformationForm {
   {
     this.tablecible.setValue(transformation.tablecible)
   }
-  this.tablecible.setValidators([Validators.required])
+ // this.tablecible.setValidators([Validators.required])
 
   if(transformation.idLigne)
   {
@@ -32,10 +31,6 @@ export class TransformationForm {
   }
   this.idLigne.setValidators([Validators.required])
 
-  if(transformation.idtransformation)
-  {
-    this.id.setValue([transformation.idtransformation])
-  }
 
   if(transformation.typeidLigne)
   {
@@ -47,6 +42,8 @@ export class TransformationForm {
   {
     this.richkeys.setValue(transformation.richkeys)
   }
+
+  
 
  // var fb= new FormBuilder
 

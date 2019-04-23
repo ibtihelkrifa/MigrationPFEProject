@@ -27,6 +27,7 @@ export class HeaderComponent implements OnInit {
     this.connectionservice.deletebases();
 
     window.location.reload();
+    this.router.navigate([""])
   }
 
 

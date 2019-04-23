@@ -1,7 +1,7 @@
 import { Transformation } from './transformation';
 
 export class Configuration {
-typeimulation: String
+typesimulation: String
 transformations: Transformation[]
 
 /*constructor(typesimulation: string, transformations?: Transformation[]) {

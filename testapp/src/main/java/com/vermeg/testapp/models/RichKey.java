@@ -4,19 +4,28 @@ import java.util.List;
 
 public class RichKey {
 
-    private List<String> colonnessources;
+    private List<String> colonnes;
     private String mappingformula;
     private String condition;
     private String colonnecible;
     private String converter;
     private String pattern;
+    private String typecolonnecible ;
 
-    public List<String> getColonnessources() {
-        return colonnessources;
+    public String getTypecolonnecible() {
+        return typecolonnecible;
     }
 
-    public void setColonnessources(List<String> colonnessources) {
-        this.colonnessources = colonnessources;
+    public void setTypecolonnecible(String typecolonnecible) {
+        this.typecolonnecible = typecolonnecible;
+    }
+
+    public List<String> getColonnes() {
+        return colonnes;
+    }
+
+    public void setColonnes(List<String> colonnes) {
+        this.colonnes = colonnes;
     }
 
     public String getMappingformula() {

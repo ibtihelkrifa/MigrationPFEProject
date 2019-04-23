@@ -10,16 +10,16 @@
         <div class="row">
           <div class="col-md-6">
             <mat-form-field>
-              <mat-label>Selectionner Le Type De Votre Simulation </mat-label>
+              <mat-label>Select Configuration Type </mat-label>
               <mat-select formControlName="typesimulation">
-                <mat-option value="Réel">Réel</mat-option>
+                <mat-option value="Réel">Real</mat-option>
                 <mat-option value="Simulation">Simulation</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
           <div class="col-md-6">
             <button class="btn btn-success" id="tooltip" (click)="addTransformation()" style="float: right;"><i class="fa fa-plus"></i>
-              <span class="tooltiptext">Ajouter transformation</span>
+              <span class="tooltiptext">Add Transformation</span>
             </button>
           </div>
           </div>
@@ -30,8 +30,10 @@
               </li>
             </ul>
 
-            <button type="submit" class="sub" (click)="saveTransformation()"
-              [disabled]="confForm.invalid">Submit</button><br><br>
+            <button type="submit" class="sub" (click)="saveTransformation();showSuccess()"
+              [disabled]="confForm.invalid">Submit</button>
+              <p-toast [style]="{marginTop: '80px'}" position="top-left" key="tl"></p-toast>
+              <br><br>
             <pre>Parent Form Status: <span class="status">{{confForm.status}}</span></pre>
           </form>
         </div>

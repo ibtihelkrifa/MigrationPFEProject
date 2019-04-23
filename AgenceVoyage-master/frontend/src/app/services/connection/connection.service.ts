@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { TableSource } from '../../models/table-source';
 import { BaseCible } from '../../models/base-cible';
 import { TableCible } from '../../models/table-cible';
+import { Configuration } from '../../models/configuration';
 
 @Injectable({
   providedIn: 'root'
@@ -41,7 +42,7 @@ export class ConnectionService {
 
 
   
-  getcurrentconnectionsource(): Observable<BaseSource>
+ getcurrentconnectionsource(): Observable<BaseSource>
   {
     return this.http.get<BaseSource>("http://localhost:8081/getCurrentSource")
   }
@@ -65,6 +66,15 @@ export class ConnectionService {
   getAllTablessCibles(): Observable<BaseCible[]>
   {
     return this.http.get<BaseCible[]>("http://localhost:8081/getTablesCibles")
+  }
+
+
+  configurer(conf: Configuration)
+  {
+   
+     this.http.post<Configuration>("http://localhost:8081/configurer",conf).subscribe(data=>{
+       console.log(data)
+     })
   }
 
 }

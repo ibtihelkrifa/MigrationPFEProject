@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Configuration>
+    <DonnéesDeConnection>
+        <source ip="127.0.0.1" motdepasse="root" nomBase="TestPFE" port="3306" utilisateur="root"/>
+        <cible hbase.master="localhost" hbase.zookeeper.property.clientPort="2181" hbase.zookeeper.quorum="localhost"/>
+    </DonnéesDeConnection>
+    <Transformations>
+        <Transformation id="0" idLigne="#numEtudiant" tablecible="STUDENTS" tablesource="etudiant"
+                        typeidLigne="java.lang.Long">
+            <CleRicheDeMappage cartographieformule="#numEtudiant  " colonnecible="FAMILY_STUDENT:id"
+                               colonnesource="numEtudiant" type="java.lang.Long"/>
+            <CleRicheDeMappage cartographieformule="#nom+#prenom " colonnecible="FAMILY_STUDENT:Fullname"
+                               colonnesource="nom,prenom" type="java.lang.String"/>
+            <CleRicheDeMappage cartographieformule="#email " colonnecible="FAMILY_STUDENT:email" colonnesource="email"
+                               type="java.lang.String"/>
+            <CleRicheDeMappage cartographieformule="#cin  " colonnecible="FAMILY_STUDENT: cin" colonnesource="cin"
+                               type="java.lang.String"/>
+        </Transformation>
+        <Transformation id="1" idLigne="#userId" tablecible="EMPLOYEES" tablesource="user" typeidLigne="java.lang.Long">
+            <CleRicheDeMappage cartographieformule="#salaire*#currency " colonnecible="FAMILY_EMPLOYEE: salaire"
+                               colonnesource="salaire" condition="salaire&gt;300" converter="NumberConverter"
+                               pattern="###,###.##" type="java.lang.String"/>
+            <CleRicheDeMappage cartographieformule="#taille  " colonnecible="FAMILY_EMPLOYEE: Taille"
+                               colonnesource="taille" condition="taille &gt; 2" type="java.lang.Double"/>
+            <CleRicheDeMappage cartographieformule="#getAge(#birthDate)" colonnecible="FAMILY_EMPLOYEE: Age"
+                               colonnesource="birthDate" type="java.lang.Integer"/>
+            <CleRicheDeMappage cartographieformule="#birthDate " colonnecible="FAMILY_EMPLOYEE: BirthDate"
+                               colonnesource="birthDate" converter="convertDateTime" pattern="MM/dd/yyyy"
+                               type="java.lang.String"/>
+            <CleRicheDeMappage cartographieformule="#firstName+#lastName  " colonnecible="FAMILY_EMPLOYEE: Fullname"
+                               colonnesource="lastName,firstName" type="java.lang.String"/>
+            <CleRicheDeMappage cartographieformule="#userId   " colonnecible="FAMILY_EMPLOYEE: userId"
+                               colonnesource="userId" type="java.lang.Long"/>
+        </Transformation>
+        <Transformation id="2" idLigne="#userId" tablecible="FACULTY" tablesource="user" typeidLigne="java.lang.Long">
+            <CleRicheDeMappage cartographieformule="#userId " colonnecible="ASSIGNMENT_FAMILY: IdUser"
+                               colonnesource="userId" type="java.lang.Long"/>
+            <CleRicheDeMappage cartographieformule="#firstName+#lastName  " colonnecible="ASSIGNMENT_FAMILY: Fullname"
+                               colonnesource="lastName,firstName" type="java.lang.String"/>
+        </Transformation>
+    </Transformations>
+</Configuration>

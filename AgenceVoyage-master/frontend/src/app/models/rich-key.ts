@@ -7,4 +7,5 @@ export class RichKey {
     colonnecible:String
     converter:String
     pattern:String
+    typecolonnecible: String
 }

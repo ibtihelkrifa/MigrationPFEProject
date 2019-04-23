@@ -1,3 +1,22 @@
+*{
+    cursor: pointer;
+}
+.click{
+    color: #000;
+    margin-left: 16px;
+
+}
+.mat-form-field-wrapper{
+    width: 436px !important;
+}
+a:link
+{
+  text-decoration:none !important;
+}
+.panel-heading{
+    background-color: #000 !important;
+    color: #fff !important;
+}
 .mat-form-field {
     margin: 0 3rem;
     padding: 10px 0 0;

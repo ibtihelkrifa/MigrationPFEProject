@@ -28,7 +28,6 @@ import { NotifierModule } from 'angular-notifier';
 import { InscriptionComponent } from './components/inscription/inscription.component';
 import { FooterComponent } from './components/footer/footer.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import { ConfigureComponent } from './components/configure/configure.component';
 import { Configure2Component } from './components/configure2/configure2.component';
 import { TransformationComponent } from './components/transformation/transformation.component';
 import { RichKeyComponent } from './components/rich-key/rich-key.component';
@@ -37,6 +36,9 @@ import { Page404NotFoundComponent } from './components/page404-not-found/page404
 import { AuthInterceptor } from './models/authorization/auth-interceptor';
 import {DragDropModule} from 'primeng/dragdrop';
 import {TableModule} from 'primeng/table';
+import {InputSwitchModule} from 'primeng/inputswitch';
+import {ToastModule} from 'primeng/toast';
+import { MessageService } from 'primeng/components/common/messageservice';
 
 @NgModule({
   declarations: [
@@ -46,7 +48,6 @@ import {TableModule} from 'primeng/table';
     LoginComponent,
     InscriptionComponent,
     FooterComponent,
-    ConfigureComponent,
     Configure2Component,
     TransformationComponent,
     RichKeyComponent,
@@ -57,7 +58,9 @@ import {TableModule} from 'primeng/table';
     NgxSmartModalModule.forRoot(),
     DragDropModule,
     TableModule,
+    ToastModule,
     MatSidenavModule,
+    InputSwitchModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
@@ -88,7 +91,7 @@ import {TableModule} from 'primeng/table';
   exports: [MatSidenavModule],
   providers: [{
     provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true
-  }],
+  },MessageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -10,6 +10,7 @@ condition= new FormControl()
 colonnecible= new FormControl()
 converter= new FormControl()
 pattern= new FormControl()
+typecolonnecible= new FormControl()
 constructor(richkey: RichKey)
 {
 
@@ -45,6 +46,11 @@ constructor(richkey: RichKey)
         {
             this.pattern.setValue(richkey.pattern)
         }
+        if(richkey.typecolonnecible)
+  {
+    this.typecolonnecible.setValue(richkey.typecolonnecible)
+  }
+  this.typecolonnecible.setValidators([Validators.required])
 
 }
 

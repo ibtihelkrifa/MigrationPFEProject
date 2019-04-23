@@ -5,6 +5,7 @@ import { ConfForm } from '../models/conf-form';
 import { Configuration } from '../models/configuration';
 import { TransformationForm } from '../models/transformation-form';
 import { Transformation } from '../models/transformation';
+import { HttpClient } from 'selenium-webdriver/http';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +21,7 @@ export class ConfigurationFormService {
 
   constructor(private fb: FormBuilder) { }
 
-  addTransformation() {
+  addTransformation(index:number) {
 
     const currentform = this.confform.getValue()
 
@@ -28,7 +29,7 @@ export class ConfigurationFormService {
 
     currentTransformations.push(
       this.fb.group(
-        new TransformationForm(new Transformation())
+        new TransformationForm(new Transformation(index))
       )
     )
     this.confform.next(currentform)
@@ -43,5 +44,5 @@ export class ConfigurationFormService {
 
     this.confform.next(currentform)
   }
-
+  
 }

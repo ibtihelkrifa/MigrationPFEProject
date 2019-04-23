@@ -1,9 +1,10 @@
 <form [formGroup]="transformationForm">
 
   <a (click)="hide(index)">
-    <i class="fa fa-eye"></i>&nbsp;&nbsp; <b class="tran">transformation Numéro:&nbsp;</b> &nbsp;&nbsp; <b><i
+    <i class="fa fa-eye"></i>&nbsp;&nbsp; <b class="tran">Transformation Number:&nbsp;</b> &nbsp;&nbsp; <b><i
         class="number">{{index}}</i></b>
   </a>
+  <br><br>
 
   <div id="{{index}}"  >
     <!--**************************************start betbet (click)="addRichKey()"******************************************************-->
@@ -17,12 +18,12 @@
       <div class="col-md-12" style="display: inline-block;border-style: solid;">
         <div class="row">
           <button class="btn btn-danger" id="tooltip" (click)="delete()" style="float: right;margin: 5px;">
-            <span class="tooltiptext">Effacer transformation</span>
+            <span class="tooltiptext">Delete Transformation</span>
             <i class="fa fa-trash"></i>
           </button>
 
           <button class="btn btn-info" id="tooltip" (click)="addRichKey()" style="float: right;margin: 5px;">
-            <span class="tooltiptext">Ajouter un mappage</span>
+            <span class="tooltiptext">Add RichKeyMap</span>
             <i class="fa fa-plus"></i>
           </button>
 
@@ -30,7 +31,7 @@
 
         <div class="col-md-6">
           <mat-form-field style="display: inline-block;">
-            <mat-label>Selectionner Table Source</mat-label>
+            <mat-label>Select Source Table</mat-label>
             <mat-select (selectionChange)="getSourceColumns()" formControlName="tablesource">
               <ng-container *ngFor="let s of tablessources$">
                 <mat-option value="{{s.nomTable}}">{{s.nomTable}}</mat-option>
@@ -40,7 +41,7 @@
         </div>
         <div class="col-md-6">
           <mat-form-field style="display: inline-block;">
-            <mat-label>Selectionner Table Cible</mat-label>
+            <mat-label>Select Target Table</mat-label>
             <mat-select (selectionChange)="getCibleColumns()" formControlName="tablecible">
               <ng-container *ngFor="let s of tablescibles$">
                 <mat-option value="{{s.nomTable}}">{{s.nomTable}}</mat-option>
@@ -50,7 +51,7 @@
         </div>
         <div class="col-md-6">
           <mat-form-field>
-            <mat-label>Selectionner idLigne</mat-label>
+            <mat-label>Select Hbase Id</mat-label>
             <mat-select formControlName="idLigne">
               <ng-container *ngFor="let c of colonnessource$">
                 <mat-option value="#{{c.nomcolonne}}">{{c.nomcolonne}}</mat-option>
@@ -60,10 +61,10 @@
         </div>
         <div class="col-md-6">
           <mat-form-field>
-            <mat-label>Selectionner type idLigne</mat-label>
+            <mat-label>Select Hbase Id Type</mat-label>
             <mat-select formControlName="typeidLigne">
               <mat-option value="java.lang.Long">Long</mat-option>
-              <mat-option value="java.lang.String">Varchar</mat-option>
+              <mat-option value="java.lang.String">String</mat-option>
               <mat-option value="java.lang.Float">Float</mat-option>
             </mat-select>
           </mat-form-field>
@@ -72,23 +73,31 @@
         <div  class="col-md-12">
           <ul>
             <li  *ngFor="let richkey of richkeys?.controls; let j = index">
-          
-              <form id="richkey{{index}}{{j}}" [formGroup]="richkey">
+
+              <form  [formGroup]="richkey">
                 <!--**********************Start sous Betbet**********************************-->
                 <br><br>
                  <div class="row" style="display: inline-block;border-style: solid;border-color: #c5cbd0">
                     <button class="btn btn-danger" id="tooltip" (click)="deleterichkey(index,j)" style="float: right;margin: 5px;">
-                        <span class="tooltiptext">Effacer Rich Key</span>
+                        <span class="tooltiptext">Delete RichKey Map</span>
                         <i class="fa fa-trash"></i>
                       </button>
-            
-              
-                  <div style="width: 350px" >
-                    <mat-form-field   >
-                      <mat-select  placeholder="Colonnes sources"    formControlName="colonnes"   multiple>        
+
+                      <a (click)="hiderichkey(index,j)">
+                        <i class="fa fa-eye"></i>&nbsp;&nbsp; <b class="tran">RichKey Map Number:&nbsp;</b> &nbsp;&nbsp; <b><i
+                            class="number">{{j}}</i></b>
+                      </a>
+               <div id="richkey{{index}}{{j}}">
+
+                  <div class="row">
+                    <div class="col-md-8">
+                    <mat-form-field>
+                      <mat-select  placeholder="Select Source Columns"    formControlName="colonnes"   multiple>        
                         <mat-option *ngFor="let c of colonnessource$" [value]="c.nomcolonne">{{c.nomcolonne}}</mat-option>
                       </mat-select>
                     </mat-form-field>
+                  </div>
+                  <div class="col-md-4"></div>
                    </div>
                 
                    <!--<mat-select (change)="getSelectedMultiple($event)" multiple>
@@ -100,23 +109,30 @@
                   </select>-->
                   <br><br>
                  <div class="col-md-12"> 
-                   <a (click)="hidepanel('panelmappage',index,j)">
-                    <i> <b >Cliquer içi pour  utiliser le panel pour écrire votre formule de mappage:&nbsp;</b></i> 
-                    </a>
+                   <b (click)="hidepanel('panelmappage',index,j)">
+                    <i> 
+                    <b class="click">Use The Panel To Write Your Mapping Formula:&nbsp; 
+                      <img src="../../../assets/tap.png">
+                    </b>
+                  </i> 
+                </b>
                   </div>
 
                   <div id="panelmappage{{index}}{{j}}" style="display: none;" class="container-fluid">
-                  <div class="panel panel-primary">
-                    <div class="panel-heading">Panel d'outils</div>
+                    <br><br><br>
+                  <div class="panel panel-default">
+                    <div class="panel-heading">Tools Panel</div>
                     <div class="panel-body">
                   <div class="col-md-3">
                       <mat-form-field>
 
-                      <mat-label>Ajouter Un Opperateur</mat-label>
+                      <mat-label>Add Opperator</mat-label>
                       <mat-select >
                         <mat-option value="+" (click)="getChangeOpperator('+',index,j)"  >+</mat-option>
                         <mat-option value="-" (click)="getChangeOpperator('-',index,j)" >-</mat-option>
                         <mat-option value="*" (click)="getChangeOpperator('*',index,j)" >*</mat-option>
+                        <mat-option value="*" (click)="getChangeOpperator('*',index,j)" >/</mat-option>
+
                       </mat-select>
                       </mat-form-field>
                   </div>
@@ -127,21 +143,19 @@
                   <div class="col-md-3">
                     <mat-form-field>
  
-                    <mat-label>Ajouter Une Fonction </mat-label>
+                    <mat-label>Use Function </mat-label>
                       <mat-select >
 
-                        <mat-option (click)="getChangeFunction('getAge()',index,j)" value="getAge" >getAge()</mat-option>
-                        <mat-option (click)="getChangeFunction('getAge()',index,j)" value="getAge">getAge()</mat-option>
+                        <mat-option (click)="getChangeFunction('#getAge()',index,j)" value="getAge" >getAge()</mat-option>
                       </mat-select>
                       </mat-form-field>
                   </div>
                   <div class="col-md-3">
                       <mat-form-field>
 
-                      <mat-label>Ajouter Une Variable Globale</mat-label>
+                      <mat-label>Use Web Service</mat-label>
                       <mat-select >
-                        <mat-option (click)="getVg('#taux',index,j)" value="taux">currency</mat-option>
-                        <mat-option (click)="getVg('#taux',index,j)" value="taux">currency</mat-option>
+                        <mat-option (click)="getVg('#currency',index,j)" value="taux">currency</mat-option>
                       </mat-select>
                       </mat-form-field>
                   </div>
@@ -171,21 +185,27 @@
   </div>
               </div>
               </div >
-                  <div class="col-md-10"  >
+              <div class="row">
+                  <div class="col-md-8">
                       <mat-form-field  >
                           <div class="ui-g-12 ui-md-6 drop-column" pDroppable="cars" 
                           (onDrop)="drop($event,index,j)"  [ngClass]="{'ui-highlight-car':draggedCar}">
-                      <input matInput id="name{{index}}{{j}}"  placeholder="Saisir Votre Formule De Mappage"
+                      <input matInput id="name{{index}}{{j}}"  placeholder="Write Your Mapping Formula"
                       formControlName="mappingformula" >
                         </div>
                       </mat-form-field>
                   </div>
+                  <div class="col-md-4"></div>
+                </div>
                
-               
-                  <div >
+                  <div class="row">
+                    <div class="col-md-8">
                       <mat-form-field >
-                      <input matInput  placeholder="Saisir la condition" formControlName="condition">
+                      <input matInput  placeholder="Write Select Condition" formControlName="condition">
                       </mat-form-field>
+                    </div>
+
+                  <div class="col-md-4"></div>
                   </div>
               <br><br><br>
 
@@ -221,50 +241,79 @@
                 </div>
                 </div>
               <div>
-                    
-                   <div>
+                    <div class="row">
+                   <div class="col-md-6">
                       <mat-form-field>
-                          <div class="ui-g-12 ui-md-6 drop-column" pDroppable="carscibles" 
+                          <div class="drop-column" pDroppable="carscibles" 
                           (onDrop)="dropcible($event,index,j)"  [ngClass]="{'ui-highlight-car':cibledragged}">
-                      <input matInput id="cible{{index}}{{j}}"  placeholder="Saisir Votre colonne cible"
+                          <input matInput id="cible{{index}}{{j}}"  placeholder="Target Family Column Name : Target Column Name"
                       formControlName="colonnecible" >
                         </div>
                       </mat-form-field>
                   </div>
+                  <div class="col-md-5">
+                    <mat-form-field>
+                      <mat-label>Select Target Column Type</mat-label>
+                      <mat-select formControlName="typecolonnecible">
+                        <mat-option value="java.lang.Double">Double</mat-option>
+                        <mat-option value="java.lang.Long">Long</mat-option>
+                        <mat-option value="java.lang.String">Varchar</mat-option>
+                        <mat-option value="java.lang.Float">Float</mat-option>
+                        <mat-option value="java.lang.Integer">Integer</mat-option>
+
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+                  <div class="col-md-1"></div>
+                </div>
 
                   <br><br>
 
 
-                  <mat-label>Utiliser un convertisseur</mat-label><br>
-                  <mat-radio-group   aria-label="Utiliser un convertisseur">
+                  <br>
+                 <!-- <mat-radio-group   aria-label="Utiliser un convertisseur">
                       <mat-radio-button (click)="show('convertisseur',index,j)" value="oui">oui</mat-radio-button>
                       <mat-radio-button  (click)="hideconvertisseur('convertisseur',index,j)" value="non">non</mat-radio-button>
-                    </mat-radio-group>
-
+                    </mat-radio-group>-->
+                    <div class="row">
+                      <div class="col-md-1"></div>
+                      <div class="col-md-5">
+                        <b><i>Use Converter : </i></b>&nbsp;&nbsp;&nbsp;<br><br>
+                        <p-inputSwitch  (click)="useConvert(index,j)"></p-inputSwitch>
+                    </div>
+                    <div class="col-md-6"></div>
+                  </div>
 
                 <div style="display: none" id="convertisseur{{index}}{{j}}" >
-                  <div class="col-md-8">
+                  <div class="row">
+                  <div class="col-md-6">
                     <mat-form-field>
-                      <mat-label>Convertisseur</mat-label>
+                      <mat-label>Converter</mat-label>
                       <mat-select formControlName="converter" >
                         <mat-option  value="convertDateTime">convertDateTime</mat-option>
                         <mat-option  value="NumberConverter">NumberConverter</mat-option>
                       </mat-select>
                     </mat-form-field>
                   </div>
-                  <br><br><br><br>
-                  <div class="col-md-8">
+                  
+                  <div class="col-md-5">
+                      <mat-form-field>
                       <input matInput placeholder="Pattern"
                       formControlName="pattern" >
+                      </mat-form-field>
                   </div>
+                  <div class="col-md-1"></div>
                 </div>
-<br><br>
-             </div>
-
+                </div>
+                <br>
+                <br>
+               </div>
                  </div>
-                 <br><br>
-              
-              </form>            </li>
+                 </div>
+                 <br>
+                 <br>
+              </form>    
+            </li>
           </ul>
         </div>
 

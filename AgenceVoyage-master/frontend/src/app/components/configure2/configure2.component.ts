@@ -3,6 +3,13 @@ import { FormGroup, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ConfigurationFormService } from '../../services/configuration-form.service';
 import { TableSource } from '../../models/table-source';
+import { HttpClient } from 'selenium-webdriver/http';
+import { ConnectionService } from '../../services/connection/connection.service';
+import { Configuration } from '../../models/configuration';
+import { MessageService } from 'primeng/components/common/messageservice';
+import Swal from 'sweetalert2'
+import { BaseSource } from '../../models/base-source';
+import { BaseCible } from '../../models/base-cible';
 
 @Component({
   selector: 'app-configure2',
@@ -14,10 +21,14 @@ export class Configure2Component implements OnInit {
   confFormSub: Subscription
   formInvalid: boolean = false;
   transformations: FormArray
- 
-  constructor(private confFormService: ConfigurationFormService) { }
+  baseSource: BaseSource
+  baseCible: BaseCible
+  index:number
+  constructor(private confFormService: ConfigurationFormService, private messageService: MessageService,private connectionservice : ConnectionService) { }
 
   ngOnInit() {
+
+    
 
     this.confFormSub = this.confFormService.confForm$
     .subscribe(conf => {    
@@ -34,7 +45,7 @@ export class Configure2Component implements OnInit {
 
   addTransformation() {
 
-    this.confFormService.addTransformation()
+    this.confFormService.addTransformation(this.index)
   }
 
   deleteTransformation(index: number) {
@@ -42,11 +53,30 @@ export class Configure2Component implements OnInit {
   }
   
 
-
+  showSuccess() {
+    this.messageService.add({severity:'success', summary: 'Success Message', detail:'Configuration en cours'});
+}
 
   saveTransformation() {
     console.log('conf saved!')
     console.log(this.confForm.value)
+    
+    const conf= new Configuration()
+    conf.transformations=this.confForm.value.transformations
+    conf.typesimulation=this.confForm.value.typesimulation
+    console.log(conf)
+
+  
+    this.connectionservice.configurer(conf)
+    Swal.fire(
+      'Opération betbet',
+      'You clicked the button!',
+      'success'
+    )
   }
+
+
+  
+
 
 }

@@ -24,7 +24,7 @@ export class TransformationComponent implements OnInit {
   @Input() index: number
   @Output() deleteTransformation: EventEmitter<number> = new EventEmitter()
   tablescibles$: any;
-  tablessources$: any;
+  sourceTables$: any;
   colonnessource$: any;
   showorhidevalue="fermer"
   richkeys: FormArray
@@ -38,6 +38,7 @@ export class TransformationComponent implements OnInit {
   colonnescibles$: any;
   cibledragged: any;
   cibleselected= '';
+  checked: boolean= false;
   colscible: { field: string; header: string; width: string; }[];
  
 
@@ -52,7 +53,7 @@ export class TransformationComponent implements OnInit {
    // this.transformationForm.controls['id'].disable()
     this.conService.getAllTablessSources().subscribe(
      data =>{
-         this.tablessources$=data
+         this.sourceTables$=data
        })
 
        this.conService.getAllTablessCibles().subscribe(
@@ -61,11 +62,11 @@ export class TransformationComponent implements OnInit {
   })
 
   this.cols = [
-    { field: 'nomcolonne', header: 'Nom Colone', width: '25%'}
+    { field: 'nomcolonne', header: 'Column Name', width: '25%'}
 ];
 
 this.colscible=[
-  { field: 'nomcolonneFamily', header: 'Nom Famille de colonne', width:'25%'}
+  { field: 'nomcolonneFamily', header: 'Family Column Name', width:'25%'}
 ]
 
   }
@@ -125,8 +126,8 @@ this.colscible=[
 
   getSourceColumns()
   {
-    const tablesourceIndex = this.tablessources$.findIndex(el => el.nomTable == this.transformationForm.value.tablesource)
-    this.colonnessource$=this.tablessources$[tablesourceIndex].colonnes
+    const tablesourceIndex = this.sourceTables$.findIndex(el => el.nomTable == this.transformationForm.value.tablesource)
+    this.colonnessource$=this.sourceTables$[tablesourceIndex].colonnes
     this.availableCars=this.colonnessource$
   }
 
@@ -220,6 +221,48 @@ getSelectedMultiple(event:any){
   this.multipleSelected.push(event.target.value);
   console.log(event.target.value);
   
+
+}
+useConvert(index,j){
+  /*var x=document.getElementById('convertisseur'+index+j)
+  if(this.checked == true){
+    x.style.display = "block";
+  }
+  else{
+    x.style.display = "none";
+  }
+}*/
+var x=document.getElementById('convertisseur'+index+j)
+this.checked = !this.checked
+if (this.checked == false) {
+  console.log("test false");
+  x.style.display = "none";
+  
+  
+  
+  
+}
+else{
+  
+  x.style.display = "block";
+  console.log("test true");
+  
+}
+
+ 
+}
+
+hiderichkey(index:number,j:number)
+{
+  var x=document.getElementById('richkey'+index+j)
+  if(x.style.display=='none')
+  {
+    x.style.display='block'
+  }
+  else
+  {
+    x.style.display='none'
+  }
 
 }
 

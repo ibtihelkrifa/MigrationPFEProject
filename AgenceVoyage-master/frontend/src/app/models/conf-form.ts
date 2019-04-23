@@ -8,8 +8,8 @@ export class ConfForm {
 
 
     constructor(conf: Configuration) {
-        if (conf.typeimulation) {
-            this.typesimulation.setValue(conf.typeimulation)
+        if (conf.typesimulation) {
+            this.typesimulation.setValue(conf.typesimulation)
         }
 
         if (conf.transformations) {
