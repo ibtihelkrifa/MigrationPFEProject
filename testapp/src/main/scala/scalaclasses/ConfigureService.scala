@@ -54,7 +54,7 @@ class ConfigureService {
     val context = new StandardEvaluationContext
     val parsers = new SpelExpressionParser
     // creer le stbales hbases
-    //userservice.UserFunctionCreateHbaseTbalesIfNotExists(document,xpath,connection)
+    userservice.UserFunctionCreateHbaseTbalesIfNotExists(document,xpath,connection)
     // crere  des temp view pour les table sources
     userservice.UserFunctionCreatTempViewOfSOurceTbales(document,xpath,spark)
     // enregistre les fonctiosn client dans SPEL COntext
@@ -117,6 +117,7 @@ class ConfigureService {
           }
 
       })
+      colonnessources= colonnessources+","+ idrow.substring(1);
 
       if(condition.length != 0)
         {

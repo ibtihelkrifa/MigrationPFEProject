@@ -8,6 +8,7 @@ import com.vermeg.testapp.services.ConnectionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import scalaclasses.BuildConf;
+import scalaclasses.ConfigureService;
 import scalaclasses.ConfigureServiceTest;
 
 import java.util.List;
@@ -47,10 +48,10 @@ public class ConfigureController {
         XStream xstream = new XStream(new DomDriver());
         String xml = xstream.toXML(conf);
         System.out.println(xml);
-        buildConf.buildsourceetcible(conf.getBaseSource(),conf.getBaseCible());
+       // buildConf.buildsourceetcible(conf.getBaseSource(),conf.getBaseCible());
 
-         buildConf.buildTransformations(conf.getTransformations());
-        new ConfigureServiceTest().Configurer("/home/ibtihel/Desktop/PFE/testapp/testconf2.xml");
+        // buildConf.buildTransformations(conf.getTransformations());
+        new ConfigureService().Configurer("/home/ibtihel/Desktop/PFE/testapp/testconfig.xml");
 
         return conf;
 

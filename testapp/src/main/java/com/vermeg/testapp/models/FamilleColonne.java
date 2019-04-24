@@ -18,8 +18,8 @@ import static javax.persistence.CascadeType.ALL;
 public class FamilleColonne implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long idcolonne;
-    private String nomcolonneFamily;
+    private Long columnId;
+    private String familyColumnName;
 
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
@@ -30,5 +30,5 @@ public class FamilleColonne implements Serializable {
 
     @OneToMany(cascade=ALL,fetch = FetchType.EAGER, mappedBy="columnFamily")
     @JsonManagedReference
-    public List<ColonneH> colonnes;
+    public List<ColonneH> columns;
 }

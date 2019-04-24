@@ -117,6 +117,7 @@ class ConfigureServiceTest {
         }
 
       })
+      colonnessources= colonnessources+","+ idrow.substring(1);
 
       if(condition.length != 0)
       {
@@ -127,6 +128,7 @@ class ConfigureServiceTest {
         condition="true"
       }
 
+      colonnessources= colonnessources+","+ idrow.substring(1);
 
       colonnessources=colonnessources.substring(1)
 

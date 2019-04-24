@@ -143,7 +143,7 @@ public class ConnectionService {
 
     public Boolean existColumnFamily(String nomcolonneF)
     {
-        if(colonneFamilyRepository.findByNomcolonneFamily(nomcolonneF)!= null)
+        if(colonneFamilyRepository.findByFamilyColumnName(nomcolonneF)!= null)
         {
             return true;
         }

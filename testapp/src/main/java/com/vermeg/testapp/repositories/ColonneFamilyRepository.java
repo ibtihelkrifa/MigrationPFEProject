@@ -12,7 +12,7 @@ import java.util.List;
 public interface ColonneFamilyRepository extends JpaRepository<FamilleColonne,Long> {
 
 
- public   FamilleColonne findByNomcolonneFamily(String nomcolonnefamille);
+ public   FamilleColonne findByFamilyColumnName(String nomcolonnefamille);
 
 
  public List<FamilleColonne> findByTable(TableCible table);
