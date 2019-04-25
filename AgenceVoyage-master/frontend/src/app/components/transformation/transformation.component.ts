@@ -24,7 +24,7 @@ export class TransformationComponent implements OnInit {
   @Input() index: number
   @Output() deleteTransformation: EventEmitter<number> = new EventEmitter()
   tablescibles$: any;
-  sourceTables$: any;
+  tablessources$: any;
   colonnessource$: any;
   showorhidevalue="fermer"
   richkeys: FormArray
@@ -53,7 +53,7 @@ export class TransformationComponent implements OnInit {
    // this.transformationForm.controls['id'].disable()
     this.conService.getAllTablessSources().subscribe(
      data =>{
-         this.sourceTables$=data
+         this.tablessources$=data
        })
 
        this.conService.getAllTablessCibles().subscribe(
@@ -126,8 +126,8 @@ this.colscible=[
 
   getSourceColumns()
   {
-    const tablesourceIndex = this.sourceTables$.findIndex(el => el.nomTable == this.transformationForm.value.tablesource)
-    this.colonnessource$=this.sourceTables$[tablesourceIndex].colonnes
+    const tablesourceIndex = this.tablessources$.findIndex(el => el.nomTable == this.transformationForm.value.tablesource)
+    this.colonnessource$=this.tablessources$[tablesourceIndex].colonnes
     this.availableCars=this.colonnessource$
   }
 
@@ -238,8 +238,7 @@ if (this.checked == false) {
   console.log("test false");
   x.style.display = "none";
   
-  
-  
+
   
 }
 else{
