@@ -48,9 +48,9 @@ public class ConfigureController {
         XStream xstream = new XStream(new DomDriver());
         String xml = xstream.toXML(conf);
         System.out.println(xml);
-       // buildConf.buildsourceetcible(conf.getBaseSource(),conf.getBaseCible());
+        buildConf.buildsourceetcible(conf.getBaseSource(),conf.getBaseCible());
 
-        // buildConf.buildTransformations(conf.getTransformations());
+         buildConf.buildTransformations(conf.getTransformations());
         new ConfigureService().Configurer("/home/ibtihel/Desktop/PFE/testapp/testconfig.xml");
 
         return conf;
