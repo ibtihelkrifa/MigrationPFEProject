@@ -58,7 +58,9 @@ class BuildConf {
         transformation.setAttribute("tablesource",transformations.get(i).getTablesource)
         transformation.setAttribute("tablecible",transformations.get(i).getTablecible)
         var richKeyListLength= transformations.get(i).getRichkeys.size()
+        var documentsLength= transformations.get(i).getDocuments.size()
         var richKeyList=transformations.get(i).getRichkeys
+        var documentList= transformations.get(i).getDocuments
         var j=0
 
         while(j< richKeyListLength)
@@ -86,6 +88,25 @@ class BuildConf {
             richKeyDom.setAttribute("colonnecible",richkey.getColonnecible)
             transformation.appendChild(richKeyDom)
             j=j+1
+          }
+
+        var d=0
+
+        while(d < documentsLength)
+          {
+            var document= documentList.get(d)
+            var documentDom= rollbackdoc.createElement("Document")
+            var colonnessources=""
+            document.getColonnessources.forEach(col=>{
+              colonnessources=colonnessources+","+col
+            })
+            documentDom.setAttribute("colonnessources",colonnessources.substring(1))
+            documentDom.setAttribute("clejointure",document.clejointure)
+            documentDom.setAttribute("typejointure",document.typejointure)
+            documentDom.setAttribute("tablesource",document.tablesource)
+            documentDom.setAttribute("colonnescibles",document.colonnecible)
+            transformation.appendChild(documentDom)
+            d=d+1
           }
 
 

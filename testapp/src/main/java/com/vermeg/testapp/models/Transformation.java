@@ -10,6 +10,7 @@ public class Transformation {
     String idLigne;
     String typeidLigne;
     List<RichKey> richkeys;
+    List<Document> documents;
 
     public Integer getIdtransformation() {
         return idtransformation;
@@ -57,5 +58,13 @@ public class Transformation {
 
     public void setRichkeys(List<RichKey> richkeys) {
         this.richkeys = richkeys;
+    }
+
+    public List<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
     }
 }

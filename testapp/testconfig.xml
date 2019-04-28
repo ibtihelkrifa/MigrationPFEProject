@@ -31,8 +31,6 @@
     <Transformations>
 
 
-
-
         <Transformation  id="1" typeidLigne="java.lang.Long" idLigne="#userId" tablesource="user" tablecible="EMPLOYEES"  >
 
             <CleRicheDeMappage  colonnesource="salaire" type="java.lang.String" converter="NumberConverter" ignoreIfNull="false"  pattern="###,###.##" cartographieformule="#salaire *#currency" condition="salaire > 300 " colonnecible="FAMILY_EMPLOYEE:Salaire"/>
@@ -40,21 +38,19 @@
             <CleRicheDeMappage  colonnesource="birthDate" type="java.lang.Integer" cartographieformule="#getAge(#birthDate)" colonnecible="FAMILY_EMPLOYEE:Age"/>
             <CleRicheDeMappage  colonnesource="birthDate" converter="convertDateTime" pattern="MM/dd/yyyy" ignoreIfNull="true"  type="java.lang.String" cartographieformule="#birthDate" colonnecible="FAMILY_EMPLOYEE:BirthDate"/>
             <CleRicheDeMappage  colonnesource="FirstName,LastName" type="java.lang.String" cartographieformule="#firstName+' '+#lastName" colonnecible="FAMILY_EMPLOYEE:FullName"/>
-            <Document colonnessources="addressId,pays,ville,rue,codePostal,userByUserId"
-                      colonnescibles="ADDRESS_EMPLOYEE:address" typekeyjoin="LEFT OUTER JOIN " clejointure="user.userId=address.userByUserId" tablesource="address" />
+            <Document   colonnessources="addressId,pays,ville,rue,codePostal,userByUserId"
+                        colonnescibles="ADDRESS_EMPLOYEE:address" typejointure="LEFT OUTER JOIN "  clejointure="user.userId=address.userByUserId"  tablesource="address" />
             <Document colonnessources="id_detail,nom_detail,address_id"
-                      colonnescibles="ADDRESS_EMPLOYEE:details" typekeyjoin="LEFT OUTER JOIN " clejointure=" addressdetails.address_id = address.addressId " tablesource="addressdetails" />
+                      colonnescibles="ADDRESS_EMPLOYEE:details"  typejointure="LEFT OUTER JOIN "  clejointure=" addressdetails.address_id = address.addressId " tablesource="addressdetails" />
 
         </Transformation>
-
-
 
         <Transformation id="4" typeidLigne="java.lang.Long" idLigne="#userId"  tablesource="user" tablecible="FACULTY">
             <CleRicheDeMappage  colonnesource="userId" type="java.lang.Long" cartographieformule="#userId" colonnecible="ASSIGNMENT_FAMILY:IDUSER" />
             <CleRicheDeMappage  colonnesource="firstName,lastName" type="java.lang.String" cartographieformule="#firstName+' '+#lastName" colonnecible="ASSIGNMENT_FAMILY:FULLNAME" />
             <Document tablesource="user_dept" colonnessources="dept_id"
                       colonnescibles="ASSIGNMENT_FAMILY:departement_id" typejointure="LEFT OUTER JOIN " clejointure="user_dept.user_id=user.userId" />
-            <Document tablesource="departement" colonnessources="idDept,nomDept" colonnescibles="ASSIGNMENT_FAMILY: departement" typekeyjoin="LEFT OUTER JOIN" clejointure="departement.idDept = user_dept.dept_id" />
+            <Document tablesource="departement" colonnessources="idDept,nomDept" colonnescibles="ASSIGNMENT_FAMILY: departement" typejointure="LEFT OUTER JOIN" clejointure="departement.idDept = user_dept.dept_id" />
 
 
         </Transformation>

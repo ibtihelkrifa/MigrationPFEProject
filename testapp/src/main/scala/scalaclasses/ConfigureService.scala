@@ -29,7 +29,7 @@ class ConfigureService {
     // enregistrer le temps de debut du programme
     val debut = System.currentTimeMillis
     //create an instance of user srevice that contains functions called in this class
-    var userservice = new UserService
+    var userservice = new UserServiceTest
     var spark = userservice.UserFunctionCreateSparkSession()
     //lire le fichier de configuration
     val xpathFactory = XPathFactory.newInstance
@@ -50,7 +50,7 @@ class ConfigureService {
     val context = new StandardEvaluationContext
     val parsers = new SpelExpressionParser
     // creer le stbales hbases
-   // userservice.UserFunctionCreateHbaseTbalesIfNotExists(document, xpath, connection)
+    //userservice.UserFunctionCreateHbaseTbalesIfNotExists(document, xpath, connection)
     // crere  des temp view pour les table sources
     userservice.UserFunctionCreatTempViewOfSOurceTbales(document, xpath, spark)
     // enregistre les fonctiosn client dans SPEL COntext

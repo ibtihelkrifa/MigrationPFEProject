@@ -46,36 +46,18 @@ public class ConfigureController {
         conf.setBaseCible(bcible);
 
         XStream xstream = new XStream(new DomDriver());
+
         String xml = xstream.toXML(conf);
+        System.out.println(conf.getTransformations().get(0).getDocuments().get(0).colonnecible);
         System.out.println(xml);
-        buildConf.buildsourceetcible(conf.getBaseSource(),conf.getBaseCible());
+         buildConf.buildsourceetcible(conf.getBaseSource(),conf.getBaseCible());
 
          buildConf.buildTransformations(conf.getTransformations());
-        new ConfigureService().Configurer("/home/ibtihel/Desktop/PFE/testapp/testconfig.xml");
+        new ConfigureService().Configurer("/home/ibtihel/Desktop/PFE/testapp/testconf2.xml");
 
         return conf;
 
     }
 
-   /* @PostMapping("/SaveBaseSource")
-    public BaseSource SaveBaseSource(@RequestBody  BaseSource baseSource)
-    {
-        System.out.println(baseSource);
-        XStream xstream = new XStream(new DomDriver());
-        String xml = xstream.toXML(baseSource);
-        System.out.println(xml);
-        return baseSource;
 
-    }
-    @PostMapping("/SaveBaseCible")
-    public BaseCible SaveBaseCible( @RequestBody BaseCible baseCible)
-    {
-        System.out.println(baseCible);
-        XStream xstream = new XStream(new DomDriver());
-        String xml = xstream.toXML(baseCible);
-        System.out.println(xml);
-        return baseCible;
-
-    }
-*/
 }

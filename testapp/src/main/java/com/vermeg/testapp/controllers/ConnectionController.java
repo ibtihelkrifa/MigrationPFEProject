@@ -131,7 +131,7 @@ public class ConnectionController {
                for (int j = 0; j < colonnesfamilies.size(); j++) {
                    if (!connectionService.existColumnFamily(colonnesfamilies.get(j))) {
                        FamilleColonne colonneF = new FamilleColonne();
-                       colonneF.setFamilyColumnName(colonnesfamilies.get(j));
+                       colonneF.setNomcolonneFamily(colonnesfamilies.get(j));
                        colonneF.setTable(listtables.get(k));
                        connectionService.savecolonneFamily(colonneF);
                    }
@@ -167,7 +167,6 @@ public class ConnectionController {
         }
         return null;
     }
-
 
 
 
