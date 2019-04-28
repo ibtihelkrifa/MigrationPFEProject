@@ -13,7 +13,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { MatRadioChange, MatRadioButton, MatSelectChange, MatCheckboxClickAction } from '@angular/material';
 import { NgxSmartModalService } from 'ngx-smart-modal';
 import * as $ from 'jquery';
-
+import { DocumenForm } from '../../models/documen-form';
+import {Document } from '../../models/document'
+import { ColonneR } from '../../models/colonne-r';
 @Component({
   selector: 'app-transformation',
   templateUrl: './transformation.component.html',
@@ -28,6 +30,7 @@ export class TransformationComponent implements OnInit {
   colonnessource$: any;
   showorhidevalue="fermer"
   richkeys: FormArray
+  documents: FormArray
   idrichkey=0
   selecteds:any;
   draggedCar:any;
@@ -37,19 +40,32 @@ export class TransformationComponent implements OnInit {
   selectedCars= '';
   colonnescibles$: any;
   cibledragged: any;
+  docdragged:any
   cibleselected= '';
   checked: boolean= false;
+  rightselected=""
+
+  leftselected=""
   colscible: { field: string; header: string; width: string; }[];
+  rightcolumns$: any;
+  colssource: {field: string; header: string; width: string;}[];
+  coldragged: any;
+  joinvalue: any="";
+  leftcolumns$: ColonneR[];
+  hbasecoldrag: any;
+  leftcolswithoutnametable$: any;
+  tables$: any;
+  hbasecols: any=""
+  tables2$: any;
  
 
   constructor(private conService: ConnectionService ,private formBuilder: FormBuilder,public ngxSmartModalService: NgxSmartModalService) { }
-   inputTextMap=""
    FunctionForm:FormGroup
 
    ngOnInit() {
   
     this.richkeys=this.transformationForm.get('richkeys') as FormArray
-
+    this.documents=this.transformationForm.get('documents') as FormArray
    // this.transformationForm.controls['id'].disable()
     this.conService.getAllTablessSources().subscribe(
      data =>{
@@ -69,6 +85,9 @@ this.colscible=[
   { field: 'nomcolonneFamily', header: 'Family Column Name', width:'25%'}
 ]
 
+this.colssource=[
+  {field:'nomcolonne', header: 'Nom Colonne' , width:'25%'}
+]
   }
 
   selected(value:any,j:any){
@@ -137,7 +156,19 @@ this.colscible=[
   }
 
 
-
+  addDocument()
+{
+  const currentdocuments= this.transformationForm.get('documents') as FormArray
+  currentdocuments.push(
+    this.formBuilder.group(
+      new DocumenForm(new Document())
+    )
+  )
+this.hbasecols=""
+this.joinvalue=""
+  this.leftcolumns$=null
+  this.rightcolumns$=null
+}
 
   addRichKey()
   {
@@ -185,12 +216,43 @@ dragCibleStart(event,cibledrag:any)
 {
   this.cibledragged=cibledrag
 }
+
+dragHbaseColsStart(event, hbasecoldrag:any)
+{
+  this.hbasecoldrag=hbasecoldrag
+}
+
+dragRightColsStart(event, leftcoldrag:any)
+{
+  this.coldragged= leftcoldrag
+}
+
+dragLeftColsStart(evenet,rightcoldrag:any )
+{
+  this.coldragged=rightcoldrag
+}
+
 dragEnd(event) {
   this.draggedCar = null;
 }
 dragCibleEnd(event)
 {
   this.cibledragged=null;
+}
+
+dragRightColsEnd(event)
+{
+  this.coldragged=null
+}
+
+dragLeftColsEnd(event)
+{
+  this.coldragged=null
+}
+
+dragHBaseColsEnd(event)
+{
+  this.hbasecoldrag=null
 }
 
 drop(event, index:number,j:number) {
@@ -216,6 +278,26 @@ dropcible(event,index:number,j:number)
 
 }
 
+dropHbasecols(event,index:number,d:number)
+{
+  if(this.hbasecoldrag)
+  { this.hbasecols=this.dropHbasecols+ this.hbasecoldrag
+    $('#hbase'+index+d).val(this.hbasecols);
+    this.hbasecoldrag=null
+  }
+}
+
+dropjoincol(event, index:number, d:number)
+{
+  if(this.coldragged)
+  {
+    this.joinvalue=this.joinvalue+this.coldragged
+   $('#join'+index+d).val(this.joinvalue) 
+   this.coldragged=null
+   
+  }
+}
+
 getSelectedMultiple(event:any){
  
   this.multipleSelected.push(event.target.value);
@@ -224,22 +306,13 @@ getSelectedMultiple(event:any){
 
 }
 useConvert(index,j){
-  /*var x=document.getElementById('convertisseur'+index+j)
-  if(this.checked == true){
-    x.style.display = "block";
-  }
-  else{
-    x.style.display = "none";
-  }
-}*/
+ 
 var x=document.getElementById('convertisseur'+index+j)
 this.checked = !this.checked
 if (this.checked == false) {
   console.log("test false");
   x.style.display = "none";
-  
 
-  
 }
 else{
   
@@ -264,5 +337,70 @@ hiderichkey(index:number,j:number)
   }
 
 }
+
+hidedoc(index:number, d: number)
+{
+  var x=document.getElementById('doc'+index+d)
+  if(x.style.display=='none')
+  {
+    x.style.display='block'
+  }
+  else{
+    x.style.display='none'
+  }
+}
+
+getLeftTable(nomTableSource: String)
+{
+  console.log("hi left")
+  
+  var colonnes: ColonneR[]
+  this.conService.getAllTablessSources().subscribe(data=>{
+    this.tables2$=data
+    this.tables$= data
+
+  })
+ 
+const tablesourceIndex= this.tables2$.findIndex(el=> el.nomTable==nomTableSource)
+colonnes=this.tables2$[tablesourceIndex].colonnes
+
+ const index= this.tables$.findIndex(el => el.nomTable == nomTableSource)
+
+  this.leftcolswithoutnametable$=this.tables$[index].colonnes
+   var i=0;
+  console.log(colonnes)
+   while(i < colonnes.length)
+  {
+    console.log(colonnes[i])
+    colonnes[i].nomcolonne=nomTableSource+"."+colonnes[i].nomcolonne
+    i=i+1
+  }
+
+  this.rightcolumns$=colonnes
+ 
+}
+
+getRightTable(nomTableSource: String)
+{
+  var colonnes: ColonneR[]
+  this.conService.getAllTablessSources().subscribe(data=>{
+    this.tables2$=data
+  })
+const tablesourceIndex= this.tables2$.findIndex(el=> el.nomTable==nomTableSource)
+colonnes=this.tables2$[tablesourceIndex].colonnes
+   var i=0;
+  console.log(colonnes)
+   while(i < colonnes.length)
+  {
+    console.log(colonnes[i])
+    colonnes[i].nomcolonne=nomTableSource+"."+colonnes[i].nomcolonne
+    i=i+1
+  }
+
+  this.leftcolumns$=colonnes
+   
+}
+
+
 
 }

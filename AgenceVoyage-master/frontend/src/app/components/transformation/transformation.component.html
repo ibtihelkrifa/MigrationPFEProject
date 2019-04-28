@@ -9,12 +9,7 @@
   <div id="{{index}}"  >
     <!--**************************************start betbet (click)="addRichKey()"******************************************************-->
     <div class="global">
-      
-    <!--  <div class="inhedden">
-          <mat-form-field >
-              <input matInput  [value]="index"  formControlName="id" >
-              </mat-form-field>
-      </div>-->
+
       <div class="col-md-12" style="display: inline-block;border-style: solid;">
         <div class="row">
           <button class="btn btn-danger" id="tooltip" (click)="delete()" style="float: right;margin: 5px;">
@@ -26,6 +21,13 @@
             <span class="tooltiptext">Add RichKeyMap</span>
             <i class="fa fa-plus"></i>
           </button>
+
+          <button class="btn btn-info" id="tooltip" (click)="addDocument()" style="float: right;margin: 5px;">
+            <span class="tooltiptext">Add Document</span>
+            <i  class="material-icons">
+                receipt
+                </i>
+         </button>
 
         </div>
 
@@ -78,10 +80,7 @@
                 <!--**********************Start sous Betbet**********************************-->
                 <br><br>
                  <div class="row" style="display: inline-block;border-style: solid;border-color: #c5cbd0">
-                    <button class="btn btn-danger" id="tooltip" (click)="deleterichkey(index,j)" style="float: right;margin: 5px;">
-                        <span class="tooltiptext">Delete RichKey Map</span>
-                        <i class="fa fa-trash"></i>
-                      </button>
+                   
 
                       <a (click)="hiderichkey(index,j)">
                         <i class="fa fa-eye"></i>&nbsp;&nbsp; <b class="tran">RichKey Map Number:&nbsp;</b> &nbsp;&nbsp; <b><i
@@ -100,13 +99,7 @@
                   <div class="col-md-4"></div>
                    </div>
                 
-                   <!--<mat-select (change)="getSelectedMultiple($event)" multiple>
-                     <mat-option *ngFor="let c of colonnessource$" [value]="c.nomcolonne">{{c.nomcolonne}}</mat-option>
-                   </mat-select>
-                
-                   <select>
-                    <option *ngFor="let x of multipleSelected">{{x}}</option>
-                  </select>-->
+              
                   <br><br>
                  <div class="col-md-12"> 
                    <b (click)="hidepanel('panelmappage',index,j)">
@@ -181,7 +174,6 @@
                         </p-table>
 
                   </div>
-                 <!-- <span><b><i>Vous-pouvez séléctionner les colones sources (drag & drop)</i></b></span>-->
   </div>
               </div>
               </div >
@@ -217,7 +209,7 @@
               <div class="panel-heading">Choisir la colonne de Famille cible par un (drag & drop)</div>
               <div class="panel-body">
                   <div class="col-md-12">
-                      <p-table [columns]="colscible" [value]="colonnescibles$" [resizableColumns]="true" [paginator]="true"  [rows]="1">
+                      <p-table [columns]="colscible" [value]="colonnescibles$" [resizableColumns]="true" [paginator]="true"  [rows]="5">
                           <ng-template pTemplate="header" let-columns>
                               <tr>
                                   <th *ngFor="let col of columns" pResizableColumn>
@@ -271,10 +263,7 @@
 
 
                   <br>
-                 <!-- <mat-radio-group   aria-label="Utiliser un convertisseur">
-                      <mat-radio-button (click)="show('convertisseur',index,j)" value="oui">oui</mat-radio-button>
-                      <mat-radio-button  (click)="hideconvertisseur('convertisseur',index,j)" value="non">non</mat-radio-button>
-                    </mat-radio-group>-->
+               
                     <div class="row">
                       <div class="col-md-1"></div>
                       <div class="col-md-5">
@@ -316,6 +305,196 @@
             </li>
           </ul>
         </div>
+
+
+        <div  class="col-md-12">
+            <ul>
+               <li *ngFor="let document of documents?.controls; let d = index">
+                  <form  [formGroup]="document">
+                    <br><br>
+                    <div class="row" style="display: inline-block;border-style: solid;border-color: #c5cbd0">
+                        <a (click)="hidedoc(index,d)">
+                            <i class="fa fa-eye"></i>&nbsp;&nbsp; <b class="tran">Document Number:&nbsp;</b> &nbsp;&nbsp; <b><i
+                                class="number">{{d}}</i></b>
+                          </a>
+                          <div id="doc{{index}}{{d}}">
+
+                     <div class="row" >
+                        <div class="col-md-5">
+                            <mat-form-field>
+                              <mat-label>Select Target Column Type</mat-label>
+                              <mat-select formControlName="typejointure">
+                                <mat-option value="LEFT OUTER JOIN">LeftOuterJoin</mat-option>
+                                <mat-option value="RIGHT OUTER JOIN">RightOuterJoin</mat-option>
+                                    
+                              </mat-select>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-md-7"> 
+
+                          </div>
+
+                     </div>
+
+
+                      <div class="row">
+                          <div class="col-md-6">
+                              <mat-form-field style="display: inline-block;">
+                                <mat-label>Select The Left Join Table</mat-label>
+                                <mat-select formControlName="tablesource" >
+                                  <ng-container *ngFor="let s of tablessources$">
+                                    <mat-option   value="{{s.nomTable}}" (click)="getLeftTable(s.nomTable)">{{s.nomTable}}</mat-option>
+                                  </ng-container>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                            <div class="col-md-6">
+                                <mat-form-field style="display: inline-block;">
+                                  <mat-label>Select The Right Join Table</mat-label>
+                                  <mat-select >
+                                    <ng-container *ngFor="let s of tablessources$">
+                                      <mat-option  (click)="getRightTable(s.nomTable)" value="{{s.nomTable}}">{{s.nomTable}}</mat-option>
+                                    </ng-container>
+                                  </mat-select>
+                                </mat-form-field>
+                              </div>
+                    
+
+                      </div>
+<br><br>
+                 
+                      <div   class="container-fluid">
+
+                          <div class="panel panel-info">
+            
+                          <div class="panel-heading">Select the Right Join Column (drag & drop)</div>
+                          <div class="panel-body">
+                              <div class="col-md-6">
+                                  <p-table [columns]="colssource" id="rightcols{{index}}{{d}}" [value]="rightcolumns$"  [resizableColumns]="true" [paginator]="true"  [rows]="5">
+                                      <ng-template pTemplate="header" let-columns>
+                                          <tr>
+                                              <th *ngFor="let col of columns" pResizableColumn>
+                                                  {{col.header}}
+                                              </th>
+                                          </tr>
+                                      </ng-template>
+                                      <ng-template pTemplate="body" let-rowData let-columns="columns">
+                                          <tr *ngFor="let col of columns">
+                                              <td  class="ui-resizable-column">
+                                                  <p pDraggable="rightcols" (onDragStart)="dragRightColsStart($event,rowData[col.field])" (onDragEnd)="dragRightColsEnd($event)">
+                                                      {{rowData[col.field]}}
+                                                  </p>
+                                              </td>
+                                          </tr>
+                                          </ng-template>
+                                  </p-table>
+            
+                            </div>
+
+                            <div class="col-md-6">
+                                <p-table [columns]="colssource" id="leftcols{{index}}{{d}}" [value]="leftcolumns$"  [resizableColumns]="true" [paginator]="true"  [rows]="5">
+                                    <ng-template pTemplate="header" let-columns>
+                                        <tr>
+                                            <th *ngFor="let col of columns" pResizableColumn>
+                                                {{col.header}}
+                                            </th>
+                                        </tr>
+                                    </ng-template>
+                                    <ng-template pTemplate="body" let-rowData let-columns="columns">
+                                        <tr *ngFor="let col of columns">
+                                            <td  class="ui-resizable-column">
+                                                <p pDraggable="rightcols" (onDragStart)="dragLeftColsStart($event,rowData[col.field])" (onDragEnd)="dragLeftColsEnd($event)">
+                                                {{rowData[col.field]}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </ng-template>
+                                </p-table>
+          
+                          </div>
+                            </div>
+                            </div>
+                            </div>
+
+
+                            <div class="row" >
+                                <div class="col-md-6">
+                                    <mat-form-field>
+                                        <div class="drop-column" pDroppable="rightcols" 
+                                        (onDrop)="dropjoincol($event,index,d)"  [ngClass]="{'ui-highlight-car':coldragged}">
+                                        <input matInput id="join{{index}}{{d}}"  placeholder="leftjoincol= rightjoincol"
+                                    formControlName="clejointure" >
+                                      </div>
+                                    </mat-form-field>
+                                </div>
+      
+                            </div>
+                            <div class="row">
+                              <div class="col-md-8">
+                              <mat-form-field>
+                                <mat-select  placeholder="Select Source Columns"    formControlName="colonnessources"   multiple>        
+                                  <mat-option *ngFor="let c of leftcolswithoutnametable$" [value]="c.nomcolonne">{{c.nomcolonne}}</mat-option>
+                                </mat-select>
+                              </mat-form-field>
+                            </div>
+                            <div class="col-md-4"></div>
+                             </div>
+                          
+
+
+                            <div   class="container-fluid">
+
+                              <div class="panel panel-info">
+                
+                              <div class="panel-heading">Select the HBase  Column (drag & drop)</div>
+                              <div class="panel-body">
+                                  <div class="col-md-6">
+                                      <p-table [columns]="colscible" id="colcible{{index}}{{d}}" [value]="colonnescibles$"  [resizableColumns]="true" [paginator]="true"  [rows]="5">
+                                          <ng-template pTemplate="header" let-columns>
+                                              <tr>
+                                                  <th *ngFor="let col of columns" pResizableColumn>
+                                                      {{col.header}}
+                                                  </th>
+                                              </tr>
+                                          </ng-template>
+                                          <ng-template pTemplate="body" let-rowData let-columns="columns">
+                                              <tr *ngFor="let col of columns">
+                                                  <td  class="ui-resizable-column">
+                                                      <p pDraggable="colshbase" (onDragStart)="dragHbaseColsStart($event,rowData[col.field])" (onDragEnd)="dragHBaseColsEnd($event)">
+                                                      {{rowData[col.field]}}
+                                                      </p>
+                                                  </td>
+                                              </tr>
+                                              </ng-template>
+                                      </p-table>
+                
+                                </div>
+                                </div>
+                                </div>
+                                
+                                </div>
+                                <div class="row" >
+                                  <div class="col-md-6">
+                                      <mat-form-field>
+                                          <div class="drop-column" pDroppable="colshbase" 
+                                          (onDrop)="dropHbasecols($event,index,d)"  [ngClass]="{'ui-highlight-car':coldragged}">
+                                          <input matInput id="hbase{{index}}{{d}}"  placeholder="leftjoincol= rightjoincol"
+                                      formControlName="colonnecible" >
+                                        </div>
+                                      </mat-form-field>
+                                  </div>
+        
+                              </div>
+             
+             
+                 
+                   </div>
+                  </div>  
+                </form>
+
+              </li>
+            </ul>
+        </div>
           
 
 
@@ -333,17 +512,3 @@
 <br><br>
 
 
-<!--<ngx-smart-modal #FunctionModal identifier="FunctionModal">
-  <form [formGroup]="FunctionForm">
-
-    <mat-radio-group formControlName="FunctionOnColumn">
-      <ng-container *ngFor="let c of colonnessource$">
-        <mat-radio-button value="#{{c.nomcolonne}}">{{c.nomcolonne}}</mat-radio-button>
-      </ng-container>
-    </mat-radio-group>
-
-  </form>
-
-
-  <button mat-button type="button" class="button" (click)="closeModal('FunctionModal')">Annuler</button>
-</ngx-smart-modal>-->

@@ -58,20 +58,20 @@ export class ConnectionService {
   }
 
 
-  getAllTablessSources(): Observable<BaseSource[]>
+  getAllTablessSources(): Observable<TableSource[]>
   {
-    return this.http.get<BaseSource[]>("http://localhost:8081/getTablesSources")
+    return this.http.get<TableSource[]>("http://localhost:8081/getTablesSources")
   }
 
-  getAllTablessCibles(): Observable<BaseCible[]>
+  getAllTablessCibles(): Observable<TableCible[]>
   {
-    return this.http.get<BaseCible[]>("http://localhost:8081/getTablesCibles")
+    return this.http.get<TableCible[]>("http://localhost:8081/getTablesCibles")
   }
 
 
   configurer(conf: Configuration)
   {
-   
+    console.log(conf)
      this.http.post<Configuration>("http://localhost:8081/configurer",conf).subscribe(data=>{
        console.log(data)
      })

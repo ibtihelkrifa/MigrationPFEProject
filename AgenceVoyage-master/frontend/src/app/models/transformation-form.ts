@@ -9,6 +9,7 @@ export class TransformationForm {
     idLigne= new FormControl()
     typeidLigne= new FormControl()
     richkeys = new FormArray([])
+    documents= new FormArray([])
     constructor(
     transformation: Transformation
   ) {
@@ -42,7 +43,10 @@ export class TransformationForm {
   {
     this.richkeys.setValue(transformation.richkeys)
   }
-
+  if(transformation.documents)
+  {
+    this.documents.setValue(transformation.documents)
+  }
   
 
  // var fb= new FormBuilder

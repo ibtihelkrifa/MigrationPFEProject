@@ -7,6 +7,7 @@ tablecible: String
 idLigne: String
 typeidLigne: String
 richkeys:RichKey[]
+documents: Document[]
 
 constructor(index: number)
 {
