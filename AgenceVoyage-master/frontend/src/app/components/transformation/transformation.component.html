@@ -343,7 +343,7 @@
                                 <mat-label>Select The Left Join Table</mat-label>
                                 <mat-select formControlName="tablesource" >
                                   <ng-container *ngFor="let s of tablessources$">
-                                    <mat-option   value="{{s.nomTable}}" (click)="getLeftTable(s.nomTable)">{{s.nomTable}}</mat-option>
+                                    <mat-option   value="{{s.nomTable}}" (click)="getLeftTable(index,d,s.nomTable)">{{s.nomTable}}</mat-option>
                                   </ng-container>
                                 </mat-select>
                               </mat-form-field>
@@ -353,7 +353,7 @@
                                   <mat-label>Select The Right Join Table</mat-label>
                                   <mat-select >
                                     <ng-container *ngFor="let s of tablessources$">
-                                      <mat-option  (click)="getRightTable(s.nomTable)" value="{{s.nomTable}}">{{s.nomTable}}</mat-option>
+                                      <mat-option  (click)="getRightTable(index,d,s.nomTable)" value="{{s.nomTable}}">{{s.nomTable}}</mat-option>
                                     </ng-container>
                                   </mat-select>
                                 </mat-form-field>
@@ -381,8 +381,8 @@
                                       <ng-template pTemplate="body" let-rowData let-columns="columns">
                                           <tr *ngFor="let col of columns">
                                               <td  class="ui-resizable-column">
-                                                  <p pDraggable="rightcols" (onDragStart)="dragRightColsStart($event,rowData[col.field])" (onDragEnd)="dragRightColsEnd($event)">
-                                                      {{rowData[col.field]}}
+                                                  <p pDraggable="rightcols" (onDragStart)="dragRightColsStart($event,this.lefttable$+'.'+rowData[col.field])" (onDragEnd)="dragRightColsEnd($event)">
+                                                      {{this.lefttable$}}.{{rowData[col.field]}}
                                                   </p>
                                               </td>
                                           </tr>
@@ -403,8 +403,8 @@
                                     <ng-template pTemplate="body" let-rowData let-columns="columns">
                                         <tr *ngFor="let col of columns">
                                             <td  class="ui-resizable-column">
-                                                <p pDraggable="rightcols" (onDragStart)="dragLeftColsStart($event,rowData[col.field])" (onDragEnd)="dragLeftColsEnd($event)">
-                                                {{rowData[col.field]}}
+                                                <p pDraggable="rightcols" (onDragStart)="dragLeftColsStart($event,this.righttable$+'.'+rowData[col.field])" (onDragEnd)="dragLeftColsEnd($event)">
+                                                  {{this.righttable$}}.{{rowData[col.field]}}
                                                 </p>
                                             </td>
                                         </tr>
@@ -433,7 +433,7 @@
                               <div class="col-md-8">
                               <mat-form-field>
                                 <mat-select  placeholder="Select Source Columns"    formControlName="colonnessources"   multiple>        
-                                  <mat-option *ngFor="let c of leftcolswithoutnametable$" [value]="c.nomcolonne">{{c.nomcolonne}}</mat-option>
+                                  <mat-option *ngFor="let c of rightcolumns$" [value]="c.nomcolonne">{{c.nomcolonne}}</mat-option>
                                 </mat-select>
                               </mat-form-field>
                             </div>

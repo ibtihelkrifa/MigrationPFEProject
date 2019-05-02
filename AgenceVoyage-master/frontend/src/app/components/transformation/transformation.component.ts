@@ -16,6 +16,7 @@ import * as $ from 'jquery';
 import { DocumenForm } from '../../models/documen-form';
 import {Document } from '../../models/document'
 import { ColonneR } from '../../models/colonne-r';
+import { TOUCH_BUFFER_MS } from '@angular/cdk/a11y';
 @Component({
   selector: 'app-transformation',
   templateUrl: './transformation.component.html',
@@ -48,7 +49,7 @@ export class TransformationComponent implements OnInit {
   leftselected=""
   colscible: { field: string; header: string; width: string; }[];
   rightcolumns$: any;
-  colssource: {field: string; header: string; width: string;}[];
+  colssource: {field: string; header: string; width: string; field2: string; field3: string}[];
   coldragged: any;
   joinvalue: any="";
   leftcolumns$: ColonneR[];
@@ -57,6 +58,8 @@ export class TransformationComponent implements OnInit {
   tables$: any;
   hbasecols: any=""
   tables2$: any;
+  lefttable$: any;
+  righttable$: any;
  
 
   constructor(private conService: ConnectionService ,private formBuilder: FormBuilder,public ngxSmartModalService: NgxSmartModalService) { }
@@ -86,7 +89,7 @@ this.colscible=[
 ]
 
 this.colssource=[
-  {field:'nomcolonne', header: 'Nom Colonne' , width:'25%'}
+  {field:'nomcolonne', header: 'Nom Colonne' , width:'25%',field2: 'table.nomTable', field3: 'nomTable'}
 ]
   }
 
@@ -281,7 +284,7 @@ dropcible(event,index:number,j:number)
 dropHbasecols(event,index:number,d:number)
 {
   if(this.hbasecoldrag)
-  { this.hbasecols=this.dropHbasecols+ this.hbasecoldrag
+  { this.hbasecols=this.hbasecols+ this.hbasecoldrag
     $('#hbase'+index+d).val(this.hbasecols);
     this.hbasecoldrag=null
   }
@@ -350,24 +353,24 @@ hidedoc(index:number, d: number)
   }
 }
 
-getLeftTable(nomTableSource: String)
+getLeftTable(index2:number,d:number,nomTableSource: String)
 {
   console.log("hi left")
   
   var colonnes: ColonneR[]
-  this.conService.getAllTablessSources().subscribe(data=>{
-    this.tables2$=data
+  /*this.conService.getAllTablessSources().subscribe(data=>{
+  //  this.tables2$=data
     this.tables$= data
 
-  })
+  })*/
  
-const tablesourceIndex= this.tables2$.findIndex(el=> el.nomTable==nomTableSource)
-colonnes=this.tables2$[tablesourceIndex].colonnes
+const tablesourceIndex= this.tablessources$.findIndex(el=> el.nomTable==nomTableSource)
+colonnes=this.tablessources$[tablesourceIndex].colonnes
+this.lefttable$=this.tablessources$[tablesourceIndex].nomTable
+// const index= this.tables2$.findIndex(el => el.nomTable == nomTableSource)
 
- const index= this.tables$.findIndex(el => el.nomTable == nomTableSource)
-
-  this.leftcolswithoutnametable$=this.tables$[index].colonnes
-   var i=0;
+ // this.leftcolswithoutnametable$=this.tables2$[index].colonnes
+ /*  var i=0;
   console.log(colonnes)
    while(i < colonnes.length)
   {
@@ -375,29 +378,35 @@ colonnes=this.tables2$[tablesourceIndex].colonnes
     colonnes[i].nomcolonne=nomTableSource+"."+colonnes[i].nomcolonne
     i=i+1
   }
-
+*/
   this.rightcolumns$=colonnes
- 
+ this.joinvalue=""
 }
 
-getRightTable(nomTableSource: String)
+
+
+getRightTable(index2:number,d:number,nomTableSource: String)
 {
   var colonnes: ColonneR[]
-  this.conService.getAllTablessSources().subscribe(data=>{
+ /* this.conService.getAllTablessSources().subscribe(data=>{
     this.tables2$=data
-  })
-const tablesourceIndex= this.tables2$.findIndex(el=> el.nomTable==nomTableSource)
-colonnes=this.tables2$[tablesourceIndex].colonnes
-   var i=0;
+  })*/
+const tablesourceIndex= this.tablessources$.findIndex(el=> el.nomTable==nomTableSource)
+colonnes=this.tablessources$[tablesourceIndex].colonnes
+this.righttable$=this.tablessources$[tablesourceIndex].nomTable
+
+  /* var i=0;
   console.log(colonnes)
    while(i < colonnes.length)
   {
     console.log(colonnes[i])
     colonnes[i].nomcolonne=nomTableSource+"."+colonnes[i].nomcolonne
     i=i+1
-  }
+  }*/
 
   this.leftcolumns$=colonnes
+  this.joinvalue=""
+
    
 }
 
