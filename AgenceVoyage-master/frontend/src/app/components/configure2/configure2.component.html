@@ -12,8 +12,8 @@
             <mat-form-field>
               <mat-label>Select Configuration Type </mat-label>
               <mat-select formControlName="typesimulation">
-                <mat-option value="Réel">Real</mat-option>
-                <mat-option value="Simulation">Simulation</mat-option>
+                <mat-option (click)="getTypeConf('Réél')" value="Réel">Real</mat-option>
+                <mat-option (click)="getTypeConf('Simulation')" value="Simulation">Simulation</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
@@ -41,6 +41,38 @@
     </div>
   </div>
   <div class="row"></div>
+  
+  <ng-template #customLoadingTemplate>
+    <div class="custom-class">
+      <div class="spinner-grow text-warning" style="width: 100%" role="status">
+        <span class="sr-only">Loading...</span>
+      </div>
+    </div>
+</ng-template>
+
+<ngx-loading [show]="loading" [config]="{ backdropBorderRadius: '3px' }" [template]="customLoadingTemplate"></ngx-loading>
+
 </div>
+
+
+<ng-template [ngIf]="rollback">
+<ng-template [ngIf]="!completedrollback">
+  <div class="row">
+      <div class="col-md-6">
+     
+            <button type="button" (click)="Rollback()" class="btn btn-success">Delete The Last Configuration</button>
+
+        </div>
+      </div>
+</ng-template>
+      <ng-template [ngIf]="completedrollback" >
+             <button class="btn btn-primary" type="button" disabled>
+              <span class="spinner-border spinner-border-sm" role="" aria-hidden="true"></span>
+              Loading Delete
+            </button>
+        </ng-template>
+      </ng-template>
+<p-toast position="top-right" ></p-toast>
+
 <br><br><br><br><br><br>
 <app-footer></app-footer>

@@ -29,10 +29,8 @@ export class TransformationComponent implements OnInit {
   tablescibles$: any;
   tablessources$: any;
   colonnessource$: any;
-  showorhidevalue="fermer"
   richkeys: FormArray
   documents: FormArray
-  idrichkey=0
   selecteds:any;
   draggedCar:any;
   availableCars:any;
@@ -41,12 +39,9 @@ export class TransformationComponent implements OnInit {
   selectedCars= '';
   colonnescibles$: any;
   cibledragged: any;
-  docdragged:any
   cibleselected= '';
   checked: boolean= false;
-  rightselected=""
 
-  leftselected=""
   colscible: { field: string; header: string; width: string; }[];
   rightcolumns$: any;
   colssource: {field: string; header: string; width: string; field2: string; field3: string}[];
@@ -54,10 +49,8 @@ export class TransformationComponent implements OnInit {
   joinvalue: any="";
   leftcolumns$: ColonneR[];
   hbasecoldrag: any;
-  leftcolswithoutnametable$: any;
   tables$: any;
   hbasecols: any=""
-  tables2$: any;
   lefttable$: any;
   righttable$: any;
  
@@ -355,30 +348,14 @@ hidedoc(index:number, d: number)
 
 getLeftTable(index2:number,d:number,nomTableSource: String)
 {
-  console.log("hi left")
   
   var colonnes: ColonneR[]
-  /*this.conService.getAllTablessSources().subscribe(data=>{
-  //  this.tables2$=data
-    this.tables$= data
-
-  })*/
+ 
  
 const tablesourceIndex= this.tablessources$.findIndex(el=> el.nomTable==nomTableSource)
 colonnes=this.tablessources$[tablesourceIndex].colonnes
 this.lefttable$=this.tablessources$[tablesourceIndex].nomTable
-// const index= this.tables2$.findIndex(el => el.nomTable == nomTableSource)
 
- // this.leftcolswithoutnametable$=this.tables2$[index].colonnes
- /*  var i=0;
-  console.log(colonnes)
-   while(i < colonnes.length)
-  {
-    console.log(colonnes[i])
-    colonnes[i].nomcolonne=nomTableSource+"."+colonnes[i].nomcolonne
-    i=i+1
-  }
-*/
   this.rightcolumns$=colonnes
  this.joinvalue=""
 }
@@ -388,21 +365,10 @@ this.lefttable$=this.tablessources$[tablesourceIndex].nomTable
 getRightTable(index2:number,d:number,nomTableSource: String)
 {
   var colonnes: ColonneR[]
- /* this.conService.getAllTablessSources().subscribe(data=>{
-    this.tables2$=data
-  })*/
+ 
 const tablesourceIndex= this.tablessources$.findIndex(el=> el.nomTable==nomTableSource)
 colonnes=this.tablessources$[tablesourceIndex].colonnes
 this.righttable$=this.tablessources$[tablesourceIndex].nomTable
-
-  /* var i=0;
-  console.log(colonnes)
-   while(i < colonnes.length)
-  {
-    console.log(colonnes[i])
-    colonnes[i].nomcolonne=nomTableSource+"."+colonnes[i].nomcolonne
-    i=i+1
-  }*/
 
   this.leftcolumns$=colonnes
   this.joinvalue=""

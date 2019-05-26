@@ -69,12 +69,16 @@ export class ConnectionService {
   }
 
 
-  configurer(conf: Configuration)
+  configurer(conf: Configuration): Observable<Configuration>
   {
     console.log(conf)
-     this.http.post<Configuration>("http://localhost:8081/configurer",conf).subscribe(data=>{
-       console.log(data)
-     })
+    return this.http.post<Configuration>("http://localhost:8081/configurer",conf)
   }
 
+  rollback()
+  {
+    console.log('hi')
+    return this.http.get("http://localhost:8081/rollback",{responseType: 'text'})
+  }
+    
 }

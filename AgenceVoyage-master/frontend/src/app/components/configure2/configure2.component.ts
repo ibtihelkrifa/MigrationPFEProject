@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import { FormGroup, FormArray } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ConfigurationFormService } from '../../services/configuration-form.service';
@@ -10,6 +10,9 @@ import { MessageService } from 'primeng/components/common/messageservice';
 import Swal from 'sweetalert2'
 import { BaseSource } from '../../models/base-source';
 import { BaseCible } from '../../models/base-cible';
+import { AlertService } from 'ngx-alerts';
+import { subscribeOn } from 'rxjs/operators';
+import {ToastModule} from 'primeng/toast';
 
 @Component({
   selector: 'app-configure2',
@@ -24,11 +27,17 @@ export class Configure2Component implements OnInit {
   baseSource: BaseSource
   baseCible: BaseCible
   index:number
-  constructor(private confFormService: ConfigurationFormService, private messageService: MessageService,private connectionservice : ConnectionService) { }
+  public loading = false;
+  public loadingTemplate: TemplateRef<any>;
+ public rollback= false
+ public typeconf:any
+ public completedrollback=false
+  errormessage: any;
+  constructor(private alertService: AlertService,private confFormService: ConfigurationFormService, private messageService: MessageService,private connectionservice : ConnectionService) { }
 
   ngOnInit() {
 
-    
+
 
     this.confFormSub = this.confFormService.confForm$
     .subscribe(conf => {    
@@ -57,25 +66,71 @@ export class Configure2Component implements OnInit {
     this.messageService.add({severity:'success', summary: 'Success Message', detail:'Configuration en cours'});
 }
 
+
+
   saveTransformation() {
-    console.log('conf saved!')
-    console.log(this.confForm.value)
-    
-    const conf= new Configuration()
+    this.loading = true;
+    this.errormessage=""
+   
+   
+   const conf= new Configuration()
     conf.transformations=this.confForm.value.transformations
     conf.typesimulation=this.confForm.value.typesimulation
-    console.log(conf)
-
   
-    this.connectionservice.configurer(conf)
-    Swal.fire(
-      'Opération betbet',
-      'You clicked the button!',
+    this.connectionservice.configurer(conf).subscribe(res => {
+
+      if(this.typeconf=="Simulation")
+      {
+        this.rollback=true
+      }
+      console.log(res)
+      this.loading = false;
+       Swal.fire(
+      'Succes !!!',
+      'Configuration Done with Success',
       'success'
     )
   }
+  , err => {
+    this.rollback=false
+    this.errormessage=err.error.apierror.message
+
+    Swal.fire(
+      'ERROR !!!',
+      this.errormessage,
+      'error'
+    )
+      this.loading = false;
+  });
+   
+  }
+  getTypeConf(type: String)
+  {
+    this.typeconf=type
+  }
 
 
+  Rollback()
+  {
+    this.completedrollback=true
+    this.connectionservice.rollback().subscribe(data =>{
+      if(data== "done")
+      {
+        this.completedrollback=false
+
+        this.rollback=false
+        this.messageService.add({severity:'success', summary:'Service Message', detail:'Configuration Deleted With Success'});
+        
+      }
+      else
+      {         this.completedrollback=false
+
+        this.rollback=false
+        this.messageService.add({severity:'Danger', summary:'Service Message', detail:'Configuration Delete Operation Failed'});
+
+      }
+    })
+  }
   
 
 

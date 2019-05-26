@@ -1,4 +1,4 @@
-import { FormArray, FormControl } from '@angular/forms';
+import { FormArray, FormControl, Validators } from '@angular/forms';
 import { Configuration } from './configuration';
 
 export class ConfForm {
@@ -11,7 +11,7 @@ export class ConfForm {
         if (conf.typesimulation) {
             this.typesimulation.setValue(conf.typesimulation)
         }
-
+        this.typesimulation.setValidators([Validators.required])
         if (conf.transformations) {
             this.transformations.setValue(conf.transformations)
         }

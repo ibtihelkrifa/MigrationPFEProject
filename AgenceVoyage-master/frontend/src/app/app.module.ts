@@ -39,6 +39,8 @@ import {TableModule} from 'primeng/table';
 import {InputSwitchModule} from 'primeng/inputswitch';
 import {ToastModule} from 'primeng/toast';
 import { MessageService } from 'primeng/components/common/messageservice';
+import { NgxLoadingModule } from 'ngx-loading';
+import { AlertModule } from 'ngx-alerts';
 
 @NgModule({
   declarations: [
@@ -51,7 +53,7 @@ import { MessageService } from 'primeng/components/common/messageservice';
     Configure2Component,
     TransformationComponent,
     RichKeyComponent,
-    Page404NotFoundComponent,       
+    Page404NotFoundComponent,
 
   ],
   imports: [
@@ -83,8 +85,10 @@ import { MessageService } from 'primeng/components/common/messageservice';
     NotifierModule,
     MatListModule,
     MatButtonToggleModule,
-    
-    MatRadioModule
+    AlertModule.forRoot({maxMessages: 5, timeout: 5000, position: 'right'}),
+    MatRadioModule,
+    NgxLoadingModule.forRoot({})
+
     
   ],
 
