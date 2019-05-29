@@ -9,8 +9,8 @@
 
 
     <FonctionClient>
-        <Fonction nomclasse="com.vermeg.testapp.services.TestService" nomfonction="getAge" InputClass="java.lang.String" />
-        <Fonction nomclasse="com.vermeg.testapp.services.TestService" nomfonction="getcurrency" InputClass="java.lang.String" />
+        <Fonction nomclasse="com.vermeg.app.services.TestService" nomfonction="getAge" InputClass="java.lang.String" />
+        <Fonction nomclasse="com.vermeg.app.services.TestService" nomfonction="getcurrency" InputClass="java.lang.String" />
     </FonctionClient>
 
     <VariablesGlobales>

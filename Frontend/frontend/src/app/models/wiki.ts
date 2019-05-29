@@ -1,3 +1,0 @@
-interface WikiFormat {
-  query : any
-}
