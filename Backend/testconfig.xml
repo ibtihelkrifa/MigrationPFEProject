@@ -19,7 +19,7 @@
 
     <Structures>
     <StructuresCibles>
-        <Table id="0" nom="EMPLOYEES" CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE"/>
+            <Table id="0" nom="EMPLOYEES" CF="FAMILY_EMPLOYEE;ADDRESS_EMPLOYEE"/>
         <Table id="1" nom="STUDENTS" CF="FAMILY_STUDENT;NOTE_STUDENT"/>
         <Table id="3" nom="DEPARTEMENT" CF="DEPARTEMENT_DETAILS" />
         <Table id="4" nom="FACULTY" CF="ASSIGNMENT_FAMILY" />

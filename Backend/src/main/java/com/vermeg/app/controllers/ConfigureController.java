@@ -62,6 +62,7 @@ public class ConfigureController {
          buildConf.buildsourceetcible(conf.getBaseSource(),conf.getBaseCible());
          buildConf.setTypeSimulation(conf.getTypesimulation());
          buildConf.buildTransformations(conf.getTransformations());
+
         new ConfigureService().Configurer("/home/ibtihel/Desktop/PFE/testapp/testconf2.xml");
 
         return conf;

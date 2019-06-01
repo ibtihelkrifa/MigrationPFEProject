@@ -300,7 +300,7 @@ class UserService {
     val spark = SparkSession
       .builder()
       .appName("TestappApplication")
-      .config("spark.master", "local[*]").config("memory","6g")
+      .config("spark.master", "local[*]").config("memory","AVAILABLE_MEMORY_MB")
       .getOrCreate(); // [1]
     return spark
   }
