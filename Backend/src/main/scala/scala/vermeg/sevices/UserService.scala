@@ -126,22 +126,20 @@ class UserService {
   def UserFunctionsetGlobalVariablesIntoContext(xpath :XPath, document:Document, spark:SparkSession, parsers: SpelExpressionParser, context: StandardEvaluationContext)
   = {
 
-  /*  var VariablesGlobales=xpath.evaluate("//vg", document, XPathConstants.NODESET).asInstanceOf[NodeList]
 
-    var g=0
-
-    while(g < VariablesGlobales.getLength)
-    {
-      var vgformula = VariablesGlobales.item(g).getAttributes.getNamedItem("value").getNodeValue
-      var nom=VariablesGlobales.item(g).getAttributes.getNamedItem("nom").getNodeValue
-      var vgexpression = parsers.parseExpression(vgformula)
-      var vgvalue = vgexpression.getValue(context).asInstanceOf[Double]
-      context.setVariable(nom, vgvalue)
-      g=g+1
-    }*/
-    var vgexpression=parsers.parseExpression("#getcurrency('http://demo1525832.mockable.io/currency')")
+    var vgexpression=parsers.parseExpression("#getcurrency('http://demo1525832.mockable.io/currency','tauxr')")
     var vgvalue= vgexpression.getValue(context).asInstanceOf[Double]
     context.setVariable("currency",vgvalue)
+
+    vgexpression=parsers.parseExpression("#getcurrency('https://free.currconv.com/api/v7/convert?q=EUR_TND&compact=ultra&apiKey=04f0757040a62121e421','EUR_TND')")
+    vgvalue=vgexpression.getValue(context).asInstanceOf[Double]
+    context.setVariable("EUR_TND",vgvalue)
+
+
+    vgexpression=parsers.parseExpression("#getcurrency('https://free.currconv.com/api/v7/convert?q=TND_EUR&compact=ultra&apiKey=04f0757040a62121e421','TND_EUR')")
+    vgvalue=vgexpression.getValue(context).asInstanceOf[Double]
+    context.setVariable("TND_EUR",vgvalue)
+
 
   }
 
@@ -160,9 +158,12 @@ class UserService {
       nc = nc + 1;
     }*/
 
-    context.registerFunction("getAge", Class.forName("com.vermeg.app.services.TestService").getDeclaredMethod("getAge", Class.forName("java.lang.String")))
-    context.registerFunction("getcurrency", Class.forName("com.vermeg.app.services.TestService").getDeclaredMethod("getcurrency", Class.forName("java.lang.String")))
+    context.registerFunction("CONCAT", Class.forName("com.vermeg.app.services.TestService").getDeclaredMethod("CONCAT", Class.forName("java.lang.String"),Class.forName("java.lang.String")))
 
+    context.registerFunction("LOWER", Class.forName("com.vermeg.app.services.TestService").getDeclaredMethod("LOWER", Class.forName("java.lang.String")))
+    context.registerFunction("UPPER", Class.forName("com.vermeg.app.services.TestService").getDeclaredMethod("UPPER", Class.forName("java.lang.String")))
+    context.registerFunction("getAge", Class.forName("com.vermeg.app.services.TestService").getDeclaredMethod("getAge", Class.forName("java.lang.String")))
+    context.registerFunction("getcurrency", Class.forName("com.vermeg.app.services.TestService").getDeclaredMethod("getcurrency", Class.forName("java.lang.String"), Class.forName("java.lang.String")))
   }
 
 
@@ -304,6 +305,7 @@ class UserService {
       .getOrCreate(); // [1]
     return spark
   }
+
 
 
 }

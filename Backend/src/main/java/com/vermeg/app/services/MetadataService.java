@@ -33,9 +33,8 @@ public class MetadataService {
 
         tablecible.setBase(baseCible);
 
-        if(! connectionService.existtablecible(tablecible.getNomTable(),baseCible)) {
             this.connectionService.saveTableCible(tablecible);
-        }
+
     }
 
 
@@ -54,7 +53,7 @@ public class MetadataService {
         }
 
 
-        List<FamilleColonne> listfamille = connectionService.getListFamille(listtables.get(k));
+      /*  List<FamilleColonne> listfamille = connectionService.getListFamille(listtables.get(k));
 
         for(int c=0; c < listfamille.size(); c++) {
 
@@ -65,12 +64,11 @@ public class MetadataService {
                 ColonneH colonneH= new ColonneH();
                 colonneH.setColumnFamily(listfamille.get(c));
                 colonneH.setNomcolonne(colonnes.get(h));
-                if(! connectionService.existColonneH(colonnes.get(h), listfamille.get(c)))
-                {
-                    connectionService.saveColonneH(colonneH);}
-            }
 
-        }
+                    connectionService.saveColonneH(colonneH);}
+
+
+        }*/
 
     }}
 

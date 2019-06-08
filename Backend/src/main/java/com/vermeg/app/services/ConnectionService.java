@@ -29,6 +29,10 @@ public class ConnectionService {
 
   @Autowired
   UserRepository userRepository;
+
+  @Autowired
+  ExecutionRepository executionRepository;
+
     public BaseSource saveBase(BaseSource baseSource)
     {
        return this.sourceRepository.save(baseSource);
@@ -259,6 +263,18 @@ public class ConnectionService {
     public List<TableCible> getAllTablesCibles()
     {
         return this.tableCibleRepository.findAll();
+    }
+
+    public void saveresultexecution(String result, String username)
+    {
+
+        User user= this.userRepository.findUserByUsername(username);
+
+        List<Execution> listexecution= this.executionRepository.findAll();
+        listexecution.get(listexecution.size()-1).setResultat(result);
+        Execution execution=listexecution.get(listexecution.size()-1);
+        execution.setOwner(user);
+        this.executionRepository.save(execution);
     }
 
 }

@@ -3,10 +3,21 @@ package com.vermeg.app.models;
 import java.util.List;
 
 public class Configuration {
+
+    String title;
     BaseSource baseSource;
+
     BaseCible baseCible;
     String typesimulation;
     List<Transformation> transformations;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
     public BaseSource getBaseSource() {
         return baseSource;

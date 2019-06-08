@@ -43,9 +43,12 @@ public class ConnectionController {
             this.deleteSource(username);
 
             Class.forName("com.mysql.jdbc.Driver");
-            String jdbcURL = "jdbc:mysql://localhost:" + baseSource.getPort() + "/" + baseSource.getNomBase();
             String user = baseSource.getUser();
             String password = baseSource.getPassword();
+
+
+            String jdbcURL = "jdbc:mysql://localhost:" + baseSource.getPort() + "/" + baseSource.getNomBase();
+
             Connection jdbcConnection = DriverManager.getConnection(jdbcURL, user, password);
             BaseSource base = this.connectionService.saveBase(baseSource);
             this.metadataService.saveSourceMetadat(baseSource, jdbcConnection);

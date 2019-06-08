@@ -1,0 +1,87 @@
+
+<!-- This snippet uses Font Awesome 5 Free as a dependency. You can download it at fontawesome.io! -->
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<body>
+        <div class="container">
+          <div class="row">
+            <div class="col-sm-9 col-md-7 col-lg-5 mx-auto" style="margin-top: 169px;">
+              <div class="card card-signin my-5">
+                <div class="card-body">
+                  <h5 class="card-title text-center"><img src="../../../assets/vermeg.png"></h5>
+                  <hr>
+                  <form class="form-signin" [formGroup]="signInForm" (ngSubmit)="onSubmit()">
+                    <div class="form-label-group">
+                      <input type="email" id="inputEmail" class="form-control" formControlName="username" placeholder="Email address" required autofocus>
+                      <label for="inputEmail">Username</label>
+                    </div>
+                    <mat-error *ngIf="signInForm.get('username').invalid && signInForm.get('username').touched">
+                            Identifiant is mandatory
+                          </mat-error> 
+                    <div class="form-label-group">
+                      <input type="password" id="inputPassword" formControlName="password" class="form-control" placeholder="Password" required>
+                      <label for="inputPassword">Password</label>
+                      <mat-error *ngIf="signInForm.get('password').invalid && signInForm.get('password').touched">
+                            Password contains at least 6 charachters
+                          </mat-error>
+                    </div>
+                    <button class="btn btn-md btn-block text-uppercase" id="login" type="submit">LOGIN</button>
+                    <div *ngIf="signInForm.submitted && isLoginFailed" class="alert alert-danger">
+                        Login failed: {{errorMessage}}
+                      </div>
+                    </form>
+                    <a [routerLink]="['/Inscription']" >Inscription</a>
+                    
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </body>
+      
+<!------<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+ Include the above in your HEAD tag
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
+<div class="container">
+    <div class="card card-login mx-auto text-center bg-dark" >
+        <div class="card-header mx-auto bg-dark">
+            <span> <img src="assets/vermeg.png" class="w-75" alt="Logo"> </span><br/>
+
+        </div>
+        <div class="card-body">
+          <form class="m-t" [formGroup]="signInForm" (ngSubmit)="onSubmit()">           
+                 <div class="input-group form-group">
+        
+            <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    </div>
+                    <input formControlName="username"  class="form-control" placeholder="Email">
+                  
+            </div>
+            <mat-error *ngIf="signInForm.get('username').invalid && signInForm.get('username').touched">
+                Adresse mail non valide
+              </mat-error>        
+            <div class="input-group form-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-key"></i></span>
+                        </div>
+                    <input type="password" formControlName="password" placeholder="Mot de Passe" class="form-control">
+                 
+                </div>
+                <mat-error *ngIf="signInForm.get('password').invalid && signInForm.get('password').touched">
+                    Mot de passe avec  au moins 6 charactères
+                  </mat-error>
+                <div class="form-group">
+                    <p id="alert" style="color: #ff0000;">{{alert}}</p>
+                    <input type="submit" name="btn" value="Login" class="btn btn-outline-danger float-right login_btn">
+                </div>
+
+            </form>
+            <button mat-button color="#000000" [routerLink]="['/Inscription']" >S'inscrire</button>
+        </div>
+    </div>
+</div> ---------->

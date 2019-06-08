@@ -1,0 +1,39 @@
+<app-header></app-header>
+<br><br><br><br>
+
+
+
+<label>Filter By Title</label>
+<input type="text" class="search" pInputText placeholder="execution title" [(ngModel)]="term" name="FirsField" />
+
+
+
+
+    <table class="table">
+            <tr>
+                    <th>Title</th>    
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    </tr>
+        <ng-container *ngFor="let execution of executions | filter:term">
+            
+
+            <tr>
+                <td>{{execution.title}}</td>
+            
+                    <td>{{execution.dateExecution}}</td>
+            
+                        <td>{{execution.typeExecution}}</td>
+                    
+                            <td>{{execution.resultat}}</td>
+                        </tr>
+            
+
+        </ng-container>
+    </table>
+  
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+
+
+<app-footer></app-footer>

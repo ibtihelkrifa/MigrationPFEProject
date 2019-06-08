@@ -1,8 +1,19 @@
 package com.vermeg.app.models;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.io.Serializable;
 import java.util.List;
 
-public class RichKey {
+
+
+public class RichKey implements Serializable {
+
 
     private List<String> colonnes;
     private String mappingformula;

@@ -68,7 +68,7 @@ public class TestService {
         return myFormatter.format(nb);
     }
 
-public static Double getcurrency(String url)
+public static Double getcurrency(String url, String jsonkey)
 {
     try {
         URL urll = new URL(url);
@@ -90,7 +90,7 @@ public static Double getcurrency(String url)
         conn.disconnect();
         JSONParser parser= new JSONParser();
         JSONObject jsoncurrency= (JSONObject) parser.parse(result);
-        return (Double) jsoncurrency.get("tauxr");
+        return (Double) jsoncurrency.get(jsonkey);
     } catch (MalformedURLException e) {
         e.printStackTrace();
     } catch (IOException e) {
@@ -102,6 +102,10 @@ public static Double getcurrency(String url)
     return Double.valueOf(0);
 
 }
+
+
+
+
 
 
 public static String FormatDate(String Date, String pattern)
@@ -127,6 +131,29 @@ public static String FormatDate(String Date, String pattern)
     }
 }
 
+
+public static String UPPER(String s)
+{
+    return s.toUpperCase();
+}
+
+public static String LOWER(String s)
+{
+    return  s.toLowerCase();
+}
+
+
+public static String CONCAT(String S1, String S2)
+{
+
+    return  S1+S2;
+}
+
+/*public static String CURRENT_DATE()
+{
+    return SSystem.currentTimeMillis()
+}
+*/
 
 
 }
